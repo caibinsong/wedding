@@ -1,14 +1,22 @@
 package models
 
 import (
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/jinzhu/gorm"
+	"errors"
 	"fmt"
 	"github.com/Amniversary/wedding-logic-redpacket/config"
+	"github.com/garyburd/redigo/redis"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
 )
 
-var db *gorm.DB
+var (
+	db       *gorm.DB
+	redis_db redis.Conn
+
+	ERROR_DB_ACTION     = errors.New("数据库操作失败")
+	ERROR_NOT_FIND_USER = errors.New("用户未注册")
+)
 
 func InitDataBase() {
 	openDb()
@@ -33,8 +41,24 @@ func openDb() {
 	db.DB().SetMaxIdleConns(20)
 	db.DB().SetMaxOpenConns(50)
 	initTable()
+
+	//连接redis数据库
+	c, err := redis.Dial("tcp", config.REDIS_CONNECT)
+	if err != nil {
+		log.Println("Connect to redis error", err)
+		return
+	}
+	redis_db = c
 }
 
 func initTable() {
-	db.AutoMigrate(new(RedPacket), new(RedPacketParams))
+	db.AutoMigrate(new(RedPacket), new(RedPacketParams), new(Balance), new(BalanceLog), new(Spending), new(Client))
+}
+
+func GetDBObject() *gorm.DB {
+	return db
+}
+
+func GetRedisDB() redis.Conn {
+	return redis_db
 }
