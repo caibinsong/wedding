@@ -3,15 +3,7 @@ package models
 import (
 	"errors"
 	"fmt"
-<<<<<<< HEAD
 	"github.com/caibinsong/wedding/config"
-=======
-<<<<<<< HEAD
-	"github.com/caibinsong/wedding/config"
-=======
-	"github.com/Amniversary/wedding-logic-redpacket/config"
->>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
->>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	"github.com/garyburd/redigo/redis"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -51,15 +43,7 @@ func openDb() {
 	initTable()
 
 	//连接redis数据库
-<<<<<<< HEAD
 	c, err := redis.Dial("tcp", config.GetConfig().Redis)
-=======
-<<<<<<< HEAD
-	c, err := redis.Dial("tcp", config.GetConfig().Redis)
-=======
-	c, err := redis.Dial("tcp", config.REDIS_CONNECT)
->>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
->>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	if err != nil {
 		log.Println("Connect to redis error", err)
 		return
