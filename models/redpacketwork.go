@@ -2,7 +2,15 @@ package models
 
 import (
 	"fmt"
+<<<<<<< HEAD
 	"github.com/caibinsong/wedding/config"
+=======
+<<<<<<< HEAD
+	"github.com/caibinsong/wedding/config"
+=======
+	"github.com/Amniversary/wedding-logic-redpacket/config"
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
+>>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"strconv"

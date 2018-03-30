@@ -4,9 +4,21 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+<<<<<<< HEAD
 	"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/models"
 	"github.com/caibinsong/wedding/utils"
+=======
+<<<<<<< HEAD
+	"github.com/caibinsong/wedding/config"
+	"github.com/caibinsong/wedding/models"
+	"github.com/caibinsong/wedding/utils"
+=======
+	"github.com/Amniversary/wedding-logic-redpacket/config"
+	"github.com/Amniversary/wedding-logic-redpacket/models"
+	"github.com/Amniversary/wedding-logic-redpacket/utils"
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
+>>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	"gopkg.in/chanxuehong/wechat.v2/mch/core"
 	"log"
 	"net/http"
@@ -99,6 +111,10 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewWXRedPacket(rp_id int64, guid string, money int64, code, attach string) (map[string]string, error) {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	var req map[string]string = map[string]string{"appid": config.GetConfig().AppId,
 		"attach":           fmt.Sprintf("%s%d;roomsvr=%s", config.ATTR_STR, rp_id, attach),
 		"body":             "<![CDATA[微信支付充值]]>",
@@ -113,6 +129,25 @@ func NewWXRedPacket(rp_id int64, guid string, money int64, code, attach string) 
 		"trade_type":       "JSAPI"}
 
 	client := core.NewClient(config.GetConfig().AppId, config.GetConfig().MchId, config.GetConfig().Key, nil)
+<<<<<<< HEAD
+=======
+=======
+	var req map[string]string = map[string]string{"appid": config.APP_ID,
+		"attach":           fmt.Sprintf("%s%d;roomsvr=%s", config.ATTR_STR, rp_id, attach),
+		"body":             "<![CDATA[微信支付充值]]>",
+		"goods_tag":        "<![CDATA[微信支付充值]]></goods_tag>",
+		"mch_id":           config.MCH_ID,
+		"nonce_str":        utils.GetMd5String(fmt.Sprintf("%d", time.Now().Unix())),
+		"notify_url":       config.NOTIFY_URL,
+		"openid":           code,
+		"out_trade_no":     strings.Replace(guid, "-", "", -1),
+		"spbill_create_ip": config.SPBILL_CREATE_IP,
+		"total_fee":        fmt.Sprint(money),
+		"trade_type":       "JSAPI"}
+
+	client := core.NewClient(config.APP_ID, config.MCH_ID, config.KEY, nil)
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
+>>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	response, err := client.PostXML("https://api.mch.weixin.qq.com/pay/unifiedorder", req)
 	if err != nil {
 		log.Println(err)
@@ -138,7 +173,15 @@ func NewWXRedPacket(rp_id int64, guid string, money int64, code, attach string) 
 }
 
 func checkRequest(req *config.WXPayNotifyReq) bool {
+<<<<<<< HEAD
 	if req.Return_code == "SUCCESS" && req.Appid == config.GetConfig().AppId && req.Mch_id == config.GetConfig().MchId {
+=======
+<<<<<<< HEAD
+	if req.Return_code == "SUCCESS" && req.Appid == config.GetConfig().AppId && req.Mch_id == config.GetConfig().MchId {
+=======
+	if req.Return_code == "SUCCESS" && req.Appid == config.APP_ID && req.Mch_id == config.MCH_ID {
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
+>>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 		return true
 	}
 	log.Println("checkRequest err:", req.Return_code, req.Appid, req.Mch_id)

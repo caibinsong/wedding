@@ -3,8 +3,18 @@ package main
 import (
 	//"crypto/rand"
 	//"github.com/Amniversary/wedding-logic-redpacket/business"
+<<<<<<< HEAD
 	"github.com/caibinsong/wedding/config"
 	//"github.com/Amniversary/wedding-logic-redpacket/models"
+=======
+<<<<<<< HEAD
+	"github.com/caibinsong/wedding/config"
+	//"github.com/Amniversary/wedding-logic-redpacket/models"
+=======
+	//"github.com/Amniversary/wedding-logic-redpacket/config"
+	"github.com/Amniversary/wedding-logic-redpacket/models"
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
+>>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	//"encoding/json"
 	//"github.com/Amniversary/wedding-logic-redpacket/utils"
 	"log"
@@ -15,6 +25,10 @@ import (
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	config.InitConfig()
 	log.Println(config.GetConfig())
 	// log.Println("start")
@@ -30,6 +44,24 @@ func main() {
 	// 	log.Println(err.Error())
 	// }
 	// log.Println(b1)
+<<<<<<< HEAD
+=======
+=======
+	// log.Println("start")
+	models.InitDataBase()
+	//log.Println(models.GetRedPacketInfo(18))
+	b0, err := models.QueryBalanceByUserId(1)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	log.Println(b0)
+	b1, err := models.QueryBalanceByUserId(2)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	log.Println(b1)
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
+>>>>>>> a64d7c5df01427534bebc1ec23b5463de6ce4777
 	/*
 		Id         int64  `gorm:"primary_key" json:"id"`
 		UserId     int64  `gorm:"not null; default:0;  type:int" json:"user_id"`
