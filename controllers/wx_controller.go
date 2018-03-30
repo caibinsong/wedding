@@ -23,11 +23,18 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		EchoJson(w, http.StatusOK, Response)
 	}()
-	code := r.Header.Get("code")
-	if code == "" {
-		Response.Msg = "请先登录"
+	//用户ID
+	userid := GetUserId(r)
+	if userid == 0 {
+		Response.Msg = "用户ID异常"
 		return
 	}
+	userinfo, err := utils.NewHttpClient().GetWXUserInfoResponse(userid)
+	if err != nil {
+		Response.Msg = err.Error()
+		return
+	}
+
 	//解析request中的数据
 	req := &config.Req_GenRedPacket{}
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
@@ -35,7 +42,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//还要判断答题红包问题不可为空
-	err := req.CheckParameter()
+	err = req.CheckParameter()
 	if err != nil {
 		Response.Msg = err.Error()
 		return
@@ -48,12 +55,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println(redFlash)
-	//用户ID
-	userid := GetUserId(r)
-	if userid == 0 {
-		Response.Msg = "用户ID异常"
-		return
-	}
+
 	//把数据保存入库
 	result, err := models.GenRedPacket(userid, redFlash, req, false)
 	if err != nil {
@@ -85,7 +87,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	attach := ToSimpleAttach(result["rp_id"].(int64), req.Data.RedPacketType, result["wish"].(string), req.Data.RoomId, req.Data.WeddingId, userid, 4)
 	/////
 	//
-	rsp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100), code, attach)
+	rsp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100), userinfo.Data.OpenId, attach)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "生成失败"

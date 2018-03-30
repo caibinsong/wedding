@@ -180,21 +180,21 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 	}
 
 	//保存入redis数据库
-	_, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, redPacket.RpId), "", "EX", "86400")
-	if err != nil {
-		log.Println("redis set failed:", err)
-		return resultMap, ERROR_DB_ACTION
-	}
-	//格式：1_3.59;2_7.93;3_3.48;
-	redis_redpack := ""
-	for k, v := range useNum.ResultRedPacketData {
-		redis_redpack = fmt.Sprintf("%s%d_%.2f;", redis_redpack, k+1, v)
-	}
-	_, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK, redPacket.RpId), redis_redpack, "EX", "86400")
-	if err != nil {
-		log.Println("redis set failed:", err)
-		return resultMap, ERROR_DB_ACTION
-	}
+	// _, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, redPacket.RpId), "", "EX", "86400")
+	// if err != nil {
+	// 	log.Println("redis set failed:", err)
+	// 	return resultMap, ERROR_DB_ACTION
+	// }
+	// //格式：1_3.59;2_7.93;3_3.48;
+	// redis_redpack := ""
+	// for k, v := range useNum.ResultRedPacketData {
+	// 	redis_redpack = fmt.Sprintf("%s%d_%.2f;", redis_redpack, k+1, v)
+	// }
+	// _, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK, redPacket.RpId), redis_redpack, "EX", "86400")
+	// if err != nil {
+	// 	log.Println("redis set failed:", err)
+	// 	return resultMap, ERROR_DB_ACTION
+	// }
 	//返回Map
 	resultMap = map[string]interface{}{"rp_id": redPacket.RpId,
 		"guid":     redPacket.Guid,
