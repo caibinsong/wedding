@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/models"
@@ -10,6 +11,7 @@ import (
 	"gopkg.in/chanxuehong/wechat.v2/mch/core"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -61,28 +63,29 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	}
 	////
 	//生成roomsvr 广播信息
-	roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"]}
-	bRoomMsg, err := json.Marshal(roomMsg)
-	if err != nil {
-		log.Println(err.Error())
-		Response.Msg = "生成广播失败"
-		return
-	}
+	// roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"]}
+	// bRoomMsg, err := json.Marshal(roomMsg)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	Response.Msg = "生成广播失败"
+	// 	return
+	// }
 
-	roomSvr := map[string]interface{}{"chatroomId": req.Data.RoomId,
-		"weddingId": req.Data.WeddingId,
-		"userId":    userid,
-		"msgType":   4,
-		"msg":       string(bRoomMsg)}
-	bAttach, err := json.Marshal(roomSvr)
-	if err != nil {
-		log.Println(err.Error())
-		Response.Msg = "生成广播失败"
-		return
-	}
+	// roomSvr := map[string]interface{}{"chatroomId": req.Data.RoomId,
+	// 	"weddingId": req.Data.WeddingId,
+	// 	"userId":    userid,
+	// 	"msgType":   4,
+	// 	"msg":       string(bRoomMsg)}
+	// bAttach, err := json.Marshal(roomSvr)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	Response.Msg = "生成广播失败"
+	// 	return
+	// }
+	attach := ToSimpleAttach(result["rp_id"].(int64), req.Data.RedPacketType, result["wish"].(string), req.Data.RoomId, req.Data.WeddingId, userid, 4)
 	/////
 	//
-	rsp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100), code, string(bAttach))
+	rsp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100), code, attach)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "生成失败"
@@ -98,9 +101,29 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	Response.Code = config.RESPONSE_OK
 }
 
+func ToSimpleAttach(rpid, rptype int64, wish string, chatroomId, weddingId, userId, msgType int64) string {
+	return fmt.Sprintf("ri=%d;rt=%d;wh=%s;ci=%d;wi=%d;ui=%d;mt=%d;",
+		rpid, rptype, wish, chatroomId, weddingId, userId, msgType)
+}
+
+func ToJsonAttach(msg string) (int, string, error) {
+	reg := regexp.MustCompile("ri=(.*?);rt=(.*?);wh=(.*?);ci=(.*?);wi=(.*?);ui=(.*?);mt=(.*?);")
+	arr := reg.FindStringSubmatch(msg)
+	if len(arr) != 8 {
+		return 0, "", errors.New("数据不正确")
+	}
+	rp_id, err := strconv.Atoi(arr[1])
+	if err != nil {
+		return 0, "", errors.New("数据不正确")
+	}
+	rst := fmt.Sprintf(`{"chatroomId":%s,"msgType":%s,"userId":%s,"weddingId":%s,"msg":"{\"rp_id\":%s,\"type\":%s,\"wish\":\"%s\"}"}`,
+		arr[4], arr[7], arr[6], arr[5], arr[1], arr[2], arr[3])
+	return rp_id, rst, nil
+}
+
 func NewWXRedPacket(rp_id int64, guid string, money int64, code, attach string) (map[string]string, error) {
 	var req map[string]string = map[string]string{"appid": config.GetConfig().AppId,
-		"attach":           fmt.Sprintf("%s%d;roomsvr=%s", config.ATTR_STR, rp_id, attach),
+		"attach":           attach,
 		"body":             "<![CDATA[微信支付充值]]>",
 		"goods_tag":        "<![CDATA[微信支付充值]]></goods_tag>",
 		"mch_id":           config.GetConfig().MchId,
@@ -145,28 +168,28 @@ func checkRequest(req *config.WXPayNotifyReq) bool {
 	return false
 }
 
-//pay_target=redpacket;rpid=1;roomsvr={fdsafa:aa}  解析出rpid 和 roomsvr广播的信息
-func parsAttach(attach string) (int, string, error) {
-	if !strings.HasPrefix(attach, config.ATTR_STR) {
-		return 0, "", fmt.Errorf("Attach error : %s", attach)
-	}
-	attach = attach[len(config.ATTR_STR):]
-	index := strings.Index(attach, ";")
-	if index <= 0 {
-		return 0, "", fmt.Errorf("Attach error : %s", attach)
-	}
-	str_rp_id := attach[:index]
-	rp_id, err := strconv.Atoi(str_rp_id)
-	if err != nil {
-		log.Println(err.Error())
-		return 0, "", err
-	}
-	index = strings.Index(attach, config.ROOM_SVR)
-	if index <= 0 {
-		return 0, "", fmt.Errorf("Attach error : %s", attach)
-	}
-	return rp_id, attach[index+len(config.ROOM_SVR):], nil
-}
+// //pay_target=redpacket;rpid=1;roomsvr={fdsafa:aa}  解析出rpid 和 roomsvr广播的信息
+// func parsAttach(attach string) (int, string, error) {
+// 	if !strings.HasPrefix(attach, config.ATTR_STR) {
+// 		return 0, "", fmt.Errorf("Attach error : %s", attach)
+// 	}
+// 	attach = attach[len(config.ATTR_STR):]
+// 	index := strings.Index(attach, ";")
+// 	if index <= 0 {
+// 		return 0, "", fmt.Errorf("Attach error : %s", attach)
+// 	}
+// 	str_rp_id := attach[:index]
+// 	rp_id, err := strconv.Atoi(str_rp_id)
+// 	if err != nil {
+// 		log.Println(err.Error())
+// 		return 0, "", err
+// 	}
+// 	index = strings.Index(attach, config.ROOM_SVR)
+// 	if index <= 0 {
+// 		return 0, "", fmt.Errorf("Attach error : %s", attach)
+// 	}
+// 	return rp_id, attach[index+len(config.ROOM_SVR):], nil
+// }
 
 //
 func CallBack(w http.ResponseWriter, r *http.Request) {
@@ -183,12 +206,7 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !strings.HasPrefix(req.Attach, config.ATTR_STR) {
-		log.Println("req.Attach:", req.Attach)
-		EchoWXXML(w, http.StatusOK, "FAIL")
-		return
-	}
-	rp_id, room_msg, err := parsAttach(req.Attach)
+	rp_id, room_msg, err := ToJsonAttach(req.Attach)
 	if err != nil {
 		log.Println(err.Error())
 		EchoWXXML(w, http.StatusOK, "FAIL")

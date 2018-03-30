@@ -44,8 +44,8 @@ type OtherList struct {
 
 //微信用户列表信息
 type GetWXUserInfo struct {
-	ActionName string `json:"action_name"`
-	Data       string `json:"data"`
+	ActionName string      `json:"action_name"`
+	Data       interface{} `json:"data"`
 }
 
 //微信用户列表信息

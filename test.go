@@ -3,7 +3,7 @@ package main
 import (
 	//"crypto/rand"
 	//"github.com/Amniversary/wedding-logic-redpacket/business"
-	"github.com/caibinsong/wedding/config"
+	//"github.com/caibinsong/wedding/config"
 	//"github.com/Amniversary/wedding-logic-redpacket/models"
 	//"encoding/json"
 	//"github.com/Amniversary/wedding-logic-redpacket/utils"
@@ -11,12 +11,41 @@ import (
 	//"math/big"
 	//"github.com/jinzhu/gorm"
 	//"time"
+	"errors"
+	"fmt"
+	"regexp"
+	"strconv"
 )
 
+// roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"]}
+// 	bRoomMsg, err := json.Marshal(roomMsg)
+// 	if err != nil {
+// 		log.Println(err.Error())
+// 		Response.Msg = "生成广播失败"
+// 		return
+// 	}
+// 	roomSvr := map[string]interface{}{"chatroomId": req.Data.RoomId,
+// 		"weddingId": req.Data.WeddingId,
+// 		"userId":    userid,
+// 		"msgType":   4,
+// 		"msg":       string(bRoomMsg)}
+
+// "chatroomId": req.Data.RoomId,
+// "weddingId": req.Data.WeddingId,
+// "userId":    userid,
+// "msgType":   4,
+// "msg":       string(bRoomMsg)
+
+//pay_target=redpacket;rpid=7;
+//roomsvr=
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-	config.InitConfig()
-	log.Println(config.GetConfig())
+	attach := ToSimpleAttach(1, 2, "答案答案答案答案答案答案答案",
+		3, 4, 5, 6)
+	log.Println(attach, len(attach))
+	log.Println(ToJsonAttach(attach))
+	//config.InitConfig()
+	//log.Println(config.GetConfig())
 	// log.Println("start")
 	// models.InitDataBase()
 	// //log.Println(models.GetRedPacketInfo(18))

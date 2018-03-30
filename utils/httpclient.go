@@ -53,7 +53,8 @@ func (this *HttpClient) GetWXUserInfoResponse(userid int64) (*config.WXUserInfoR
 		"userId":     fmt.Sprintf("%d", userid)}
 
 	//body主体信息
-	var request *config.GetWXUserInfo = &config.GetWXUserInfo{ActionName: "get_user_info", Data: "get_user_info"}
+	var data map[string]interface{} = map[string]interface{}{"user_id": userid, "app_id": 4}
+	var request *config.GetWXUserInfo = &config.GetWXUserInfo{ActionName: "user_info", Data: data}
 	var response *config.WXUserInfoResponse = &config.WXUserInfoResponse{}
 
 	//发送post请求
