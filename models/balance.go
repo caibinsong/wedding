@@ -4,8 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+<<<<<<< HEAD
 	"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/utils"
+=======
+	"github.com/Amniversary/wedding-logic-redpacket/config"
+	"github.com/Amniversary/wedding-logic-redpacket/utils"
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
 	"github.com/jinzhu/gorm"
 	"log"
 	"time"

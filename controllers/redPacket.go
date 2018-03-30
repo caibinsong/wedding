@@ -2,9 +2,15 @@ package controllers
 
 import (
 	"encoding/json"
+<<<<<<< HEAD
 	"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/models"
 	"github.com/caibinsong/wedding/utils"
+=======
+	"github.com/Amniversary/wedding-logic-redpacket/config"
+	"github.com/Amniversary/wedding-logic-redpacket/models"
+	"github.com/Amniversary/wedding-logic-redpacket/utils"
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
 	"log"
 	"net/http"
 	"strconv"
@@ -18,6 +24,7 @@ func GenRedPacket(w http.ResponseWriter, r *http.Request) {
 	}()
 	//解析request中的数据
 	req := &config.Req_GenRedPacket{}
+<<<<<<< HEAD
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		log.Printf("request genRedPacket json decode err: %v", err)
 		Response.Msg = "请求参数有误"
@@ -30,6 +37,109 @@ func GenRedPacket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//红包金额数组
+	redFlash, err := utils.GenRedPacket(req.Data.RedPacketType, float64(req.Data.RedPacketNum), req.Data.RedPacketMoney)
+	if err != nil {
+		Response.Msg = err.Error()
+		return
+	}
+	//用户ID
+	userid := GetUserId(r)
+	if userid == 0 {
+		Response.Msg = "用户ID异常"
+		return
+	}
+	//把数据保存入库
+	result, err := models.GenRedPacket(userid, redFlash, req, true)
+	if err != nil {
+		Response.Msg = err.Error()
+		return
+	}
+	//发送roomsvr 广播
+	roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"]}
+	bRoomMsg, err := json.Marshal(roomMsg)
+	if err != nil {
+		log.Println(err.Error())
+		Response.Msg = "广播失败"
+		return
+	}
+
+	roomSvr := map[string]interface{}{"chatroomId": req.Data.RoomId,
+		"weddingId": req.Data.WeddingId,
+		"userId":    userid,
+		"msgType":   4,
+		"msg":       string(bRoomMsg)}
+	err = utils.NewHttpClient().RoomSvr(roomSvr)
+	if err != nil {
+		Response.Msg = err.Error()
+		return
+	}
+	Response.Data = result
+	Response.Code = config.RESPONSE_OK
+}
+
+//抢红包
+func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
+	Response := &config.Response{Code: config.RESPONSE_ERROR}
+	defer func() {
+		EchoJson(w, http.StatusOK, Response)
+	}()
+	//解析request中的数据
+	req := &config.Req_RedPacket{}
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		log.Printf("request Req_RedPacket json decode err: %v", err)
+		return
+	}
+	//用户ID
+	userid := GetUserId(r)
+	if userid == 0 {
+		Response.Msg = "用户ID异常"
+		return
+	}
+	_, err := models.CheckUserRedPacket(userid, req)
+=======
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		log.Printf("request genRedPacket json decode err: %v", err)
+		Response.Msg = "请求参数有误"
+		return
+	}
+	//传入值合法性校验
+	err := req.CheckParameter()
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
+	if err != nil {
+		Response.Msg = err.Error()
+		return
+	}
+	b, err := models.QueryBalanceByUserId(userid)
+	if err != nil {
+		log.Println("balance 中未发现", userid, "用户", err.Error())
+		Response.Msg = "请先授权登录"
+		return
+	}
+	log.Println(b)
+	rp_params_id, money, err := models.GetRedPack(userid, req.Data.RpId)
+	if err != nil {
+		Response.Msg = err.Error()
+		return
+	}
+	err = models.GrabRedPacket(userid, req.Data.RpId, int64(rp_params_id), money)
+	if err != nil {
+		log.Println(err.Error())
+		Response.Msg = "红包已经抢完！"
+		return
+	}
+	redPacket := models.FindRedPacketByRpId(req.Data.RpId)
+	Response.Data = map[string]interface{}{"rp_id": req.Data.RpId,
+		"red_type": redPacket.RedPacketType}
+	Response.Code = config.RESPONSE_OK
+}
+
+//红包列表
+func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
+	Response := &config.Response{Code: config.RESPONSE_ERROR}
+
+<<<<<<< HEAD
+=======
 	//红包金额数组
 	redFlash, err := utils.GenRedPacket(req.Data.RedPacketType, float64(req.Data.RedPacketNum), req.Data.RedPacketMoney)
 	if err != nil {
@@ -122,6 +232,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 	Response := &config.Response{Code: config.RESPONSE_ERROR}
 
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
 	defer func() {
 		EchoJson(w, http.StatusOK, Response)
 	}()

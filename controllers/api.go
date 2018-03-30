@@ -3,8 +3,13 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+<<<<<<< HEAD
 	"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/models"
+=======
+	"github.com/Amniversary/wedding-logic-redpacket/config"
+	"github.com/Amniversary/wedding-logic-redpacket/models"
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
 	"io"
 	"log"
 	"net/http"
@@ -22,7 +27,10 @@ var MethodMap map[string]MethodFunc = map[string]MethodFunc{"genRedPacket": GenR
 
 func init() {
 	//数据库初始化
+<<<<<<< HEAD
 	config.InitConfig()
+=======
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
 	models.InitDataBase()
 	http.HandleFunc("/rpc", RunRpc)
 	http.HandleFunc("/wechat_callback", CallBack)

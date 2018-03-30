@@ -3,7 +3,11 @@ package utils
 import (
 	"crypto/rand"
 	"fmt"
+<<<<<<< HEAD
 	"github.com/caibinsong/wedding/config"
+=======
+	"github.com/Amniversary/wedding-logic-redpacket/config"
+>>>>>>> dd12374ac95f08e4145cdb3fa4b628e5d98bd4d3
 	"math/big"
 	mathrand "math/rand"
 	"strconv"
