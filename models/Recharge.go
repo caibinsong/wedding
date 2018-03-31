@@ -1,5 +1,11 @@
 package models
 
+import (
+	"fmt"
+	"log"
+	"time"
+)
+
 type Recharge struct {
 	Id           int64   `gorm:"primary_key" json:"id"`
 	UserId       int64   `gorm:"not null; default:0;  type:int" json:"user_id"`                    //婚礼ID
@@ -19,4 +25,18 @@ type Recharge struct {
 
 func (Recharge) TableName() string {
 	return "cRecharge"
+}
+
+func InsertRecharge(userid int64, price float64, OpUniqueNo string) (string, error) {
+	recharge := Recharge{UserId: userid,
+		Price:      price,
+		PayMoney:   price,
+		PayBill:    fmt.Sprintf("REAL-RG-%s", OpUniqueNo),
+		OpUniqueNo: OpUniqueNo,
+		CreateAt:   time.Now().Unix()}
+	err := db.Create(&recharge).Error
+	if err != nil {
+		log.Println("insert into recharge err：", err)
+	}
+	return fmt.Sprintf("REAL-RG-%s", OpUniqueNo), err
 }

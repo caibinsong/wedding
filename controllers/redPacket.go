@@ -43,7 +43,7 @@ func GenRedPacket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//把数据保存入库
-	result, err := models.GenRedPacket(userid, redFlash, req, true)
+	result, _, err := models.GenRedPacket(userid, redFlash, req, true)
 	if err != nil {
 		Response.Msg = err.Error()
 		return

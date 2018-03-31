@@ -57,7 +57,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	var genRedPacket *config.Req_GenRedPacket = &config.Req_GenRedPacket{Data: req.Data.Params}
 	log.Println(genRedPacket)
 	//把数据保存入库
-	result, err := models.GenRedPacket(userid, redFlash, genRedPacket, false)
+	result, bill_no, err := models.GenRedPacket(userid, redFlash, genRedPacket, false)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "生成失败"
@@ -93,14 +93,15 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "生成失败"
 		return
 	}
+
 	Response.Data = map[string]string{"appId": rsp["appid"],
 		"nonceStr":  rsp["nonce_str"],
-		"package":   rsp["prepay_id"],
+		"package":   fmt.Sprintf("prepay_id=%s", rsp["prepay_id"]),
 		"signType":  "MD5",
 		"timeStamp": fmt.Sprint(time.Now().Unix()),
 		"paySign":   rsp["sign"],
 		"total_fee": fmt.Sprint(int64(redFlash.Money * 100)),
-		"bill_no":   "test_1234567"}
+		"bill_no":   bill_no}
 	Response.Code = config.RESPONSE_OK
 }
 

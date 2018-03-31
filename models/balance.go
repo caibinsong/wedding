@@ -98,7 +98,8 @@ func QueryBalanceByUserId(userid int64) (*Balance, error) {
 }
 
 //user_id
-func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPacket, isBalanceType bool) (map[string]interface{}, error) {
+func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPacket, isBalanceType bool) (map[string]interface{}, string, error) {
+	bill_no := ""
 	tx := db.Begin()
 	defer func() {
 		if tx != nil {
@@ -123,7 +124,7 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 	err := tx.Create(&spending).Error
 	if err != nil {
 		log.Println("insert into spending err：", err)
-		return resultMap, ERROR_DB_ACTION
+		return resultMap, bill_no, ERROR_DB_ACTION
 	}
 
 	var red_packet_status int64 = 0
@@ -131,16 +132,21 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 	if isBalanceType {
 		err := updateBalance(tx, userId, -useNum.Money, spending.Id, now, opUniqueNo)
 		if err != nil {
-			return nil, err
+			return nil, bill_no, err
 		}
 		red_packet_status = 1
+	} else {
+		bill_no, err = InsertRecharge(userId, useNum.Money, opUniqueNo)
+		if err != nil {
+			return nil, bill_no, err
+		}
 	}
 
 	//生成红包
 	bQuestion, err := json.Marshal(req.Data.Question)
 	if err != nil {
 		log.Println(err.Error())
-		return resultMap, ERROR_DB_ACTION
+		return resultMap, bill_no, ERROR_DB_ACTION
 	}
 	redPacket := RedPacket{Guid: utils.GetGuid(),
 		UserId:         userId,
@@ -157,7 +163,7 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 	err = tx.Create(&redPacket).Error
 	if err != nil {
 		log.Println("inser into redpacket err:", err)
-		return resultMap, ERROR_DB_ACTION
+		return resultMap, bill_no, ERROR_DB_ACTION
 	}
 
 	//生成红包明细
@@ -175,26 +181,26 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 		err = tx.Create(&redPacketParams).Error
 		if err != nil {
 			log.Println("inser into redpacketparams err:", err)
-			return resultMap, ERROR_DB_ACTION
+			return resultMap, bill_no, ERROR_DB_ACTION
 		}
 	}
 
 	//保存入redis数据库
-	// _, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, redPacket.RpId), "", "EX", "86400")
-	// if err != nil {
-	// 	log.Println("redis set failed:", err)
-	// 	return resultMap, ERROR_DB_ACTION
-	// }
-	// //格式：1_3.59;2_7.93;3_3.48;
-	// redis_redpack := ""
-	// for k, v := range useNum.ResultRedPacketData {
-	// 	redis_redpack = fmt.Sprintf("%s%d_%.2f;", redis_redpack, k+1, v)
-	// }
-	// _, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK, redPacket.RpId), redis_redpack, "EX", "86400")
-	// if err != nil {
-	// 	log.Println("redis set failed:", err)
-	// 	return resultMap, ERROR_DB_ACTION
-	// }
+	_, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, redPacket.RpId), "", "EX", "86400")
+	if err != nil {
+		log.Println("redis set failed:", err)
+		return resultMap, bill_no, ERROR_DB_ACTION
+	}
+	//格式：1_3.59;2_7.93;3_3.48;
+	redis_redpack := ""
+	for k, v := range useNum.ResultRedPacketData {
+		redis_redpack = fmt.Sprintf("%s%d_%.2f;", redis_redpack, k+1, v)
+	}
+	_, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK, redPacket.RpId), redis_redpack, "EX", "86400")
+	if err != nil {
+		log.Println("redis set failed:", err)
+		return resultMap, bill_no, ERROR_DB_ACTION
+	}
 	//返回Map
 	resultMap = map[string]interface{}{"rp_id": redPacket.RpId,
 		"guid":     redPacket.Guid,
@@ -202,7 +208,7 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 		"question": req.Data.Question}
 	tx.Commit()
 	tx = nil
-	return resultMap, nil
+	return resultMap, bill_no, nil
 }
 
 //修改balance 后 insert into balancelog   balance 大于0 表示收入  小于0 表示消费
