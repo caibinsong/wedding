@@ -38,6 +38,7 @@ type Config struct {
 	ServerName     string `xml:"servername"`
 	Mysql          MySql  `xml:"mysql"`
 	Redis          string `xml:"redis"`
+	RedisPassWord  string `xml:"redispassword"`
 	WXUserInfoUrl  string `xml:"wxuserinfourl"`
 	WXUserListUrl  string `xml:"wxuserlisturl"`
 	RoomSvrUrl     string `xml:"roomsvrurl"`
