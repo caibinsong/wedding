@@ -89,21 +89,24 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	attach := ToSimpleAttach(result["rp_id"].(int64), req.Data.Params.RedPacketType, result["wish"].(string), req.Data.Params.RoomId, req.Data.Params.WeddingId, userid, 4)
 	/////
 	//
-	rsp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100), userinfo.Data.OpenId, attach)
+	rsp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100),
+		userinfo.Data.OpenId, attach)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "生成失败"
 		return
 	}
 	log.Println(bill_no, rsp)
-	// Response.Data = map[string]string{"appId": rsp["appid"],
-	// 	"nonceStr":  rsp["nonce_str"],
-	// 	"package":   fmt.Sprintf("prepay_id=%s", rsp["prepay_id"]),
-	// 	"signType":  "MD5",
-	// 	"timeStamp": fmt.Sprint(time.Now().Unix()),
-	// 	"paySign":   rsp["sign"],
-	// 	"total_fee": fmt.Sprint(int64(redFlash.Money * 100)),
-	// 	"bill_no":   bill_no}
+	Response.Data = map[string]string{"appId": config.GetConfig().AppId,
+		"signType":  "MD5",
+		"total_fee": fmt.Sprint(int64(redFlash.Money * 100)),
+		"bill_no":   bill_no,
+		"package":   fmt.Sprintf("prepay_id=%s", rsp.PrepayId),
+		"timeStamp": fmt.Sprint(time.Now().Unix()),
+
+		"nonceStr": utils.GetMd5String(fmt.Sprintf("%d", time.Now().Unix())),
+		//"paySign":  rsp["sign"],
+	}
 	Response.Code = config.RESPONSE_OK
 }
 
