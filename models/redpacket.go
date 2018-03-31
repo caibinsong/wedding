@@ -56,12 +56,12 @@ func (RedPacketParams) TableName() string {
 
 //微信回调时 修改redpacket 和redpacketparams 的status状态
 func UpDateRedPacketStatus(rpId int64) error {
-	err := db.Where(&RedPacket{RpId: rpId}).Updates(map[string]interface{}{"status": 1}).Error
+	err := db.Table("cRedPacket").Where(&RedPacket{RpId: rpId}).Updates(map[string]interface{}{"status": 1}).Error
 	if err != nil {
 		log.Println(err.Error())
 		return err
 	}
-	err = db.Where(&RedPacketParams{RpId: rpId}).Updates(map[string]interface{}{"status": 1}).Error
+	err = db.Table("cRedPacketParams").Where(&RedPacketParams{RpId: rpId}).Updates(map[string]interface{}{"status": 1}).Error
 	if err != nil {
 		log.Println(err.Error())
 	}
