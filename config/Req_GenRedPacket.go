@@ -19,7 +19,7 @@ type Req_WXGenRedPacket struct {
 	Data       struct {
 		UserId    int64         `json:"user_id"`
 		PayType   int64         `json:"pay_type"`
-		PayTarget int64         `json:"pay_target"`
+		PayTarget string        `json:"pay_target"`
 		Params    RedPacketInfo `json:"params"`
 	} `json:"data"`
 }
