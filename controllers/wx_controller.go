@@ -9,6 +9,7 @@ import (
 	"github.com/caibinsong/wedding/models"
 	"github.com/caibinsong/wedding/utils"
 	"gopkg.in/chanxuehong/wechat.v2/mch/core"
+	"gopkg.in/chanxuehong/wechat.v2/mch/pay"
 	"log"
 	"net/http"
 	"regexp"
@@ -34,6 +35,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = err.Error()
 		return
 	}
+	log.Println(userinfo)
 	//解析request中的数据
 	req := &config.Req_WXGenRedPacket{}
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
@@ -93,15 +95,15 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "生成失败"
 		return
 	}
-
-	Response.Data = map[string]string{"appId": rsp["appid"],
-		"nonceStr":  rsp["nonce_str"],
-		"package":   fmt.Sprintf("prepay_id=%s", rsp["prepay_id"]),
-		"signType":  "MD5",
-		"timeStamp": fmt.Sprint(time.Now().Unix()),
-		"paySign":   rsp["sign"],
-		"total_fee": fmt.Sprint(int64(redFlash.Money * 100)),
-		"bill_no":   bill_no}
+	log.Println(bill_no, rsp)
+	// Response.Data = map[string]string{"appId": rsp["appid"],
+	// 	"nonceStr":  rsp["nonce_str"],
+	// 	"package":   fmt.Sprintf("prepay_id=%s", rsp["prepay_id"]),
+	// 	"signType":  "MD5",
+	// 	"timeStamp": fmt.Sprint(time.Now().Unix()),
+	// 	"paySign":   rsp["sign"],
+	// 	"total_fee": fmt.Sprint(int64(redFlash.Money * 100)),
+	// 	"bill_no":   bill_no}
 	Response.Code = config.RESPONSE_OK
 }
 
@@ -125,30 +127,53 @@ func ToJsonAttach(msg string) (int, string, error) {
 	return rp_id, rst, nil
 }
 
-func NewWXRedPacket(rp_id int64, guid string, money int64, code, attach string) (map[string]string, error) {
-	var req map[string]string = map[string]string{"appid": config.GetConfig().AppId,
-		"attach":           attach,
-		"body":             "<![CDATA[微信支付充值]]>",
-		"goods_tag":        "<![CDATA[微信支付充值]]></goods_tag>",
-		"mch_id":           config.GetConfig().MchId,
-		"nonce_str":        utils.GetMd5String(fmt.Sprintf("%d", time.Now().Unix())),
-		"notify_url":       config.GetConfig().NotifyUrl,
-		"openid":           code,
-		"out_trade_no":     strings.Replace(guid, "-", "", -1),
-		"spbill_create_ip": config.GetConfig().SpbillCreateIp,
-		"total_fee":        fmt.Sprint(money),
-		"trade_type":       "JSAPI"}
-
+func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string) ( /*map[string]string*/ *pay.UnifiedOrderResponse, error) {
+	uor := &pay.UnifiedOrderRequest{
+		DeviceInfo:     "WEB",
+		Detail:         "<![CDATA[微信支付充值]]>",
+		Attach:         attach,
+		Body:           "<![CDATA[微信支付充值]]>",
+		GoodsTag:       "<![CDATA[微信支付充值]]></goods_tag>",
+		NonceStr:       utils.GetMd5String(fmt.Sprintf("%d", time.Now().Unix())),
+		NotifyURL:      config.GetConfig().NotifyUrl,
+		OpenId:         openid,
+		OutTradeNo:     strings.Replace(guid, "-", "", -1),
+		SpbillCreateIP: config.GetConfig().SpbillCreateIp,
+		TotalFee:       money,
+		TradeType:      "JSAPI",
+	}
 	client := core.NewClient(config.GetConfig().AppId, config.GetConfig().MchId, config.GetConfig().Key, nil)
-	response, err := client.PostXML("https://api.mch.weixin.qq.com/pay/unifiedorder", req)
+	rsp, err := pay.UnifiedOrder2(client, uor)
 	if err != nil {
-		log.Println(err)
+		log.Println("mch pay unified order error: ", err)
 		return nil, err
 	}
-	if response["result_code"] != "SUCCESS" {
-		return nil, fmt.Errorf(response["return_msg"])
-	}
-	return response, nil
+	log.Println(rsp, err)
+	return rsp, err
+	///////
+	// var req map[string]string = map[string]string{"appid": config.GetConfig().AppId,
+	// 	"attach":           attach,
+	// 	"body":             "<![CDATA[微信支付充值]]>",
+	// 	"goods_tag":        "<![CDATA[微信支付充值]]></goods_tag>",
+	// 	"mch_id":           config.GetConfig().MchId,
+	// 	"nonce_str":        utils.GetMd5String(fmt.Sprintf("%d", time.Now().Unix())),
+	// 	"notify_url":       config.GetConfig().NotifyUrl,
+	// 	"openid":           code,
+	// 	"out_trade_no":     strings.Replace(guid, "-", "", -1),
+	// 	"spbill_create_ip": config.GetConfig().SpbillCreateIp,
+	// 	"total_fee":        fmt.Sprint(money),
+	// 	"trade_type":       "JSAPI"}
+
+	// client := core.NewClient(config.GetConfig().AppId, config.GetConfig().MchId, config.GetConfig().Key, nil)
+	// response, err := client.PostXML("https://api.mch.weixin.qq.com/pay/unifiedorder", req)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return nil, err
+	// }
+	// if response["result_code"] != "SUCCESS" {
+	// 	return nil, fmt.Errorf(response["return_msg"])
+	// }
+	// return response, nil
 	/*
 		map[
 			result_code:SUCCESS
