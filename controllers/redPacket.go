@@ -116,7 +116,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	redPacket := models.FindRedPacketByRpId(req.Data.RpId)
 	Response.Data = map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}
-	speeding, err := models.QuerySpendingByGuid(redPacket.Guid)
+	speeding, err := models.QuerySpending(redPacket.UserId, redPacket.CreateAt)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "广播失败"
@@ -186,7 +186,8 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 	for _, one_user := range list {
 		userlist = append(userlist, int(one_user.UserId))
 	}
-
+	log.Println(userlist)
+	log.Println(len(userlist))
 	otherInfo := config.OtherInfo{Count: len(userlist)}
 	otherInfo.List = make([]config.OtherList, 0)
 	//获取明细微信信息列表
@@ -197,6 +198,12 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Println(response_list)
+		// for _, one_userId := range userlist {
+		// 	for _, one := range response_list.Data {
+		// 		if one_userId==one.
+		// 	}
+		// }
+
 		for k, one := range response_list.Data {
 			if k >= len(list) {
 				break
