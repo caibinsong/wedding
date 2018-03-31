@@ -9,7 +9,6 @@ import (
 	"github.com/caibinsong/wedding/models"
 	"github.com/caibinsong/wedding/utils"
 	"gopkg.in/chanxuehong/wechat.v2/mch/core"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
@@ -35,10 +34,8 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = err.Error()
 		return
 	}
-	a, er := ioutil.ReadAll(r.Body)
-	log.Println(string(a), er)
 	//解析request中的数据
-	req := &config.Req_GenRedPacket{}
+	req := &config.Req_WXGenRedPacket{}
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		log.Printf("request genRedPacket json decode err: %v", err)
 		return
@@ -51,15 +48,16 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//红包金额数组
-	redFlash, err := utils.GenRedPacket(req.Data.RedPacketType, float64(req.Data.RedPacketNum), req.Data.RedPacketMoney)
+	redFlash, err := utils.GenRedPacket(req.Data.Params.RedPacketType, float64(req.Data.Params.RedPacketNum), req.Data.Params.RedPacketMoney)
 	if err != nil {
 		Response.Msg = err.Error()
 		return
 	}
 	log.Println(redFlash)
-
+	var genRedPacket *config.Req_GenRedPacket = &config.Req_GenRedPacket{Data: req.Data.Params}
+	log.Println(genRedPacket)
 	//把数据保存入库
-	result, err := models.GenRedPacket(userid, redFlash, req, false)
+	result, err := models.GenRedPacket(userid, redFlash, genRedPacket, false)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "生成失败"
@@ -86,7 +84,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	// 	Response.Msg = "生成广播失败"
 	// 	return
 	// }
-	attach := ToSimpleAttach(result["rp_id"].(int64), req.Data.RedPacketType, result["wish"].(string), req.Data.RoomId, req.Data.WeddingId, userid, 4)
+	attach := ToSimpleAttach(result["rp_id"].(int64), req.Data.Params.RedPacketType, result["wish"].(string), req.Data.Params.RoomId, req.Data.Params.WeddingId, userid, 4)
 	/////
 	//
 	rsp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100), userinfo.Data.OpenId, attach)
