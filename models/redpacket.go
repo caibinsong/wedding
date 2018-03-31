@@ -55,13 +55,13 @@ func (RedPacketParams) TableName() string {
 }
 
 //微信回调时 修改redpacket 和redpacketparams 的status状态
-func UpDateRedPacketStatus(rpId int64) error {
+func UpDateRedPacketStatus(rpId int64, Transaction_id string) error {
 	rp, err := FindRedPacketInfoByRpId(rpId)
 	if err != nil {
 		log.Println(err.Error())
 		return err
 	}
-	err = UpdateRecharge(rp.UserId, rp.CreateAt)
+	err = UpdateRecharge(rp.UserId, rp.CreateAt, Transaction_id)
 	if err != nil {
 		log.Println(err.Error())
 		return err

@@ -42,8 +42,8 @@ func InsertRecharge(userid int64, price float64, OpUniqueNo string) (string, err
 	return fmt.Sprintf("REAL-RG-%s", OpUniqueNo), err
 }
 
-func UpdateRecharge(userid int64, createAt int64) error {
-	sql := fmt.Sprintf("update  cRecharge  set status_result=2, pay_times=1 where user_id=%d and `create_at`=%d;", userid, createAt)
+func UpdateRecharge(userid int64, createAt int64, Transaction_id string) error {
+	sql := fmt.Sprintf("update  cRecharge  set status_result=2, pay_times=1,other_pay_bill='%s' where user_id=%d and `create_at`=%d;", Transaction_id, userid, createAt)
 	log.Println(sql)
 	return db.Exec(sql).Error
 }

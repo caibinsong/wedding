@@ -249,7 +249,7 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
-	log.Println(req.Transaction_id)
+	log.Println()
 	log.Println(req.Out_trade_no)
 	log.Println(req)
 	rp_id, room_msg, err := ToJsonAttach(req.Attach)
@@ -258,7 +258,7 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
-	if models.UpDateRedPacketStatus(int64(rp_id)) != nil {
+	if models.UpDateRedPacketStatus(int64(rp_id), req.Transaction_id) != nil {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
