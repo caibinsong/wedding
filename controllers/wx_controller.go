@@ -95,7 +95,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	}
 	Response.Data = map[string]string{"appId": rsp["appid"],
 		"nonceStr":  rsp["nonce_str"],
-		"package":   fmt.Sprintf("prepay_id=%s", rsp["prepay_id"]),
+		"package":   rsp["prepay_id"],
 		"signType":  "MD5",
 		"timeStamp": fmt.Sprint(time.Now().Unix()),
 		"paySign":   rsp["sign"],
