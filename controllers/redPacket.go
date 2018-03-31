@@ -198,6 +198,9 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println(response_list)
 		for k, one := range response_list.Data {
+			if k >= len(list) {
+				break
+			}
 			add := config.OtherList{UserId: list[k].UserId,
 				NickName: one.NickName,
 				Pic:      one.Pic,
