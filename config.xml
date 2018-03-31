@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
 	<!--服务名-->
-	<servername>wedding_red_packet</servername>
+	<servername>weddingRedPacket</servername>
 	<mysql>
-		<dbname>cAuth</dbname>
-		<host>127.0.0.1</host>
+		<dbname>cbsTest</dbname>
+		<host>sh-cdb-c7gk8cwq.sql.tencentcdb.com:63769</host>
 		<user>root</user>
-		<pass>123456</pass>
+		<pass>tkC42cwy2U3SQwHw</pass>
 		<debug>dev</debug>
 		<!--
 			wedding_card
@@ -16,14 +16,14 @@
 			prod
 		-->
 	</mysql>
-	<redis>127.0.0.1:6379</redis>
-
+	<redis>172.17.16.10:6379</redis>
+        <redispassword>RCaX238DdkddYSV8</redispassword>
 	<!--微信请求地址-->
-	<wxuserinfourl>https://access.hunlibaoapp.com/socket/response.do</wxuserinfourl>
-	<wxuserlisturl>https://access.hunlibaoapp.com/socket/response.do</wxuserlisturl>
+	<wxuserinfourl>http://172.17.16.3:5607/api/response.do</wxuserinfourl>
+	<wxuserlisturl>http://172.17.16.3:5607/api/response.do</wxuserlisturl>
 
 	<!--广播地址-->
-	<roomsvrurl>https://access.hunlibaoapp.com/socket/response.do</roomsvrurl>
+	<roomsvrurl>http://172.17.0.13:6566/rpc</roomsvrurl>
 
 	<!--微信支付相关信息-->
 	<appid>wx1e16505b46f55fc3</appid>
@@ -31,7 +31,7 @@
 	<key>Ej1OlMdS54J8AfsZcmZGfYufNqYPSXuH</key>
 	<spbillcreateip>172.17.0.13</spbillcreateip>
 	<!--微信支付回调地址-->
-	<notifyurl>https://logic.hunlibaoapp.com/wxpay/wxpay_notify</notifyurl>
+	<notifyurl>http://182.254.247.115:5501/wechat_callback</notifyurl>
 	<!--end-->
 </config>
 
