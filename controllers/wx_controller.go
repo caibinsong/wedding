@@ -249,6 +249,8 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
+	log.Println(req.Transaction_id)
+	log.Println(req.Out_trade_no)
 	log.Println(req)
 	rp_id, room_msg, err := ToJsonAttach(req.Attach)
 	if err != nil {
@@ -260,6 +262,7 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
+	log.Println(room_msg)
 	var roomMsg map[string]interface{} = make(map[string]interface{})
 	log.Println(room_msg)
 	err = json.Unmarshal([]byte(room_msg), &roomMsg)
