@@ -122,14 +122,8 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "广播失败"
 		return
 	}
-	//{"weddingId":1,"chatroomId":1,"userId":1,"data":{"rp_id":1,"red_type":1},"msg":{"code":0}}
 
-	// roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
-	// 	"weddingId": speeding.WeddingId,
-	// 	"userId":    userid,
-	// 	"msg":       map[string]interface{}{"code": 0},
-	// 	"data":      map[string]interface{}{"rp_id": req.Data.RpId, "red_type": redPacket.RedPacketType}}
-	/////
+	/////广播
 	roomMsg := map[string]interface{}{"rp_id": req.Data.RpId,
 		"type": redPacket.RedPacketType,
 		"wish": redPacket.Remark1}
@@ -139,17 +133,10 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "广播失败"
 		return
 	}
-
 	roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
 		"weddingId": speeding.WeddingId,
 		"userId":    userid,
-		"msgType":   4,
 		"msg":       string(bRoomMsg)}
-	// roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
-	// 	"weddingId": speeding.WeddingId,
-	// 	"userId":    userid,
-	// 	"msg":       "{\"code\": 0}",
-	// 	"data":      fmt.Sprintf("{\"rp_id\": %d, \"red_type\": %d}", req.Data.RpId, redPacket.RedPacketType)}
 	err = utils.NewHttpClient().RoomSvr(roomSvr)
 	if err != nil {
 		Response.Msg = err.Error()
