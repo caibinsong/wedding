@@ -249,7 +249,7 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
-
+	log.Println(req)
 	rp_id, room_msg, err := ToJsonAttach(req.Attach)
 	if err != nil {
 		log.Println(err.Error())
