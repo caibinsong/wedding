@@ -9,6 +9,7 @@ import (
 	"github.com/caibinsong/wedding/models"
 	"github.com/caibinsong/wedding/utils"
 	"gopkg.in/chanxuehong/wechat.v2/mch/core"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
@@ -34,7 +35,8 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = err.Error()
 		return
 	}
-
+	a, er := ioutil.ReadAll(r.Body)
+	log.Println(string(a), er)
 	//解析request中的数据
 	req := &config.Req_GenRedPacket{}
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
