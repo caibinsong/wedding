@@ -8,6 +8,7 @@ import (
 	"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/models"
 	"github.com/caibinsong/wedding/utils"
+	"github.com/chanxuehong/rand"
 	"gopkg.in/chanxuehong/wechat.v2/mch/core"
 	"gopkg.in/chanxuehong/wechat.v2/mch/pay"
 	"log"
@@ -15,7 +16,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 //微信创建红包
@@ -89,7 +89,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	attach := ToSimpleAttach(result["rp_id"].(int64), req.Data.Params.RedPacketType, result["wish"].(string), req.Data.Params.RoomId, req.Data.Params.WeddingId, userid, 4)
 	/////
 	//
-	rsp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100),
+	rsp, paySign, nonceStr, timestamp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100),
 		userinfo.Data.OpenId, attach)
 	if err != nil {
 		log.Println(err.Error())
@@ -102,10 +102,9 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		"total_fee": fmt.Sprint(int64(redFlash.Money * 100)),
 		"bill_no":   bill_no,
 		"package":   fmt.Sprintf("prepay_id=%s", rsp.PrepayId),
-		"timeStamp": fmt.Sprint(time.Now().Unix()),
-
-		"nonceStr": utils.GetMd5String(fmt.Sprintf("%d", time.Now().Unix())),
-		//"paySign":  rsp["sign"],
+		"timeStamp": timestamp,
+		"nonceStr":  nonceStr,
+		"paySign":   paySign,
 	}
 	Response.Code = config.RESPONSE_OK
 }
@@ -130,14 +129,15 @@ func ToJsonAttach(msg string) (int, string, error) {
 	return rp_id, rst, nil
 }
 
-func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string) ( /*map[string]string*/ *pay.UnifiedOrderResponse, error) {
+func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string) ( /*map[string]string*/ *pay.UnifiedOrderResponse, string, string, string, error) {
+	nonceStr := string(rand.NewHex())
 	uor := &pay.UnifiedOrderRequest{
 		DeviceInfo:     "WEB",
 		Detail:         "<![CDATA[微信支付充值]]>",
 		Attach:         attach,
 		Body:           "<![CDATA[微信支付充值]]>",
 		GoodsTag:       "<![CDATA[微信支付充值]]></goods_tag>",
-		NonceStr:       utils.GetMd5String(fmt.Sprintf("%d", time.Now().Unix())),
+		NonceStr:       nonceStr,
 		NotifyURL:      config.GetConfig().NotifyUrl,
 		OpenId:         openid,
 		OutTradeNo:     strings.Replace(guid, "-", "", -1),
@@ -149,10 +149,22 @@ func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string
 	rsp, err := pay.UnifiedOrder2(client, uor)
 	if err != nil {
 		log.Println("mch pay unified order error: ", err)
-		return nil, err
+		return nil, "", "", "", err
 	}
+	// registerInfo.WxJsApiParams = WxJsApiParams{
+	// 	AppId:     self.l.cfg.ReadingOauth.ReadingWxAppId,
+	// 	TimeStamp: fmt.Sprintf("%d", time.Now().Unix()),
+	// 	NonceStr:  string(rand.NewHex()),
+	// 	Package:   fmt.Sprintf("prepay_id=%s", unifiedRsp.PrepayId),
+	// 	SignType:  ,
+	// }
+	timestamp := fmt.Sprintf("prepay_id=%s", rsp.PrepayId)
+	PaySign := core.JsapiSign(config.GetConfig().AppId, timestamp, nonceStr,
+		timestamp,
+		"MD5",
+		config.GetConfig().Key)
 	log.Println(rsp, err)
-	return rsp, err
+	return rsp, PaySign, nonceStr, timestamp, err
 	///////
 	// var req map[string]string = map[string]string{"appid": config.GetConfig().AppId,
 	// 	"attach":           attach,
