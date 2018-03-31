@@ -48,11 +48,16 @@ func openDb() {
 		log.Println("Connect to redis error", err)
 		return
 	}
+	if config.GetConfig().RedisPassWord != "" {
+		if _, err := c.Do("AUTH", config.GetConfig().RedisPassWord); err != nil {
+			log.Println(err)
+		}
+	}
 	redis_db = c
 }
 
 func initTable() {
-	db.AutoMigrate(new(RedPacket), new(RedPacketParams), new(Balance), new(BalanceLog), new(Spending), new(Client))
+	db.AutoMigrate(new(RedPacket), new(RedPacketParams), new(Balance), new(BalanceLog), new(Spending), new(Client), new(Recharge))
 }
 
 func GetDBObject() *gorm.DB {

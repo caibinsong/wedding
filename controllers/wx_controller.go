@@ -99,6 +99,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		"signType":  "MD5",
 		"timeStamp": fmt.Sprint(time.Now().Unix()),
 		"paySign":   rsp["sign"],
+		"total_fee": fmt.Sprint(int64(redFlash.Money * 100)),
 		"bill_no":   "test_1234567"}
 	Response.Code = config.RESPONSE_OK
 }
