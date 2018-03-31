@@ -133,8 +133,8 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
 		"weddingId": speeding.WeddingId,
 		"userId":    userid,
-		"msg":       `{\"code\": 0}`,
-		"data":      fmt.Sprintf(`{\"rp_id\": %d, \"red_type\": %d}`, req.Data.RpId, redPacket.RedPacketType)}
+		"msg":       "{\"code\": 0}",
+		"data":      fmt.Sprintf("{\"rp_id\": %d, \"red_type\": %d}", req.Data.RpId, redPacket.RedPacketType)}
 	err = utils.NewHttpClient().RoomSvr(roomSvr)
 	if err != nil {
 		Response.Msg = err.Error()
