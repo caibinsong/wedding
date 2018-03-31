@@ -40,3 +40,5 @@ func InsertRecharge(userid int64, price float64, OpUniqueNo string) (string, err
 	}
 	return fmt.Sprintf("REAL-RG-%s", OpUniqueNo), err
 }
+
+func UpdateRecharge() {}

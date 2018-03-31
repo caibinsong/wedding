@@ -18,3 +18,8 @@ type Spending struct {
 func (Spending) TableName() string {
 	return "cSpending"
 }
+func QuerySpendingByGuid(guid string) (*Spending, error) {
+	spending := &Spending{}
+	err := db.Table("cSpending").Where(&Spending{OpUniqueNo: guid}).First(spending).Error
+	return spending, err
+}

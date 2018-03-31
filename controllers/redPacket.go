@@ -112,9 +112,28 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "红包已经抢完！"
 		return
 	}
+
 	redPacket := models.FindRedPacketByRpId(req.Data.RpId)
 	Response.Data = map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}
+	speeding, err := models.QuerySpendingByGuid(redPacket.Guid)
+	if err != nil {
+		log.Println(err.Error())
+		Response.Msg = "广播失败"
+		return
+	}
+	//{"weddingId":1,"chatroomId":1,"userId":1,"data":{"rp_id":1,"red_type":1},"msg":{"code":0}}
+
+	roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
+		"weddingId": speeding.WeddingId,
+		"userId":    userid,
+		"msg":       map[string]interface{}{"code": 0},
+		"data":      map[string]interface{}{"rp_id": req.Data.RpId, "red_type": redPacket.RedPacketType}}
+	err = utils.NewHttpClient().RoomSvr(roomSvr)
+	if err != nil {
+		Response.Msg = err.Error()
+		return
+	}
 	Response.Code = config.RESPONSE_OK
 }
 
@@ -140,7 +159,6 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println(redPacket)
 
-	//redPacket.UserId = 844
 	//获取发红包人个人微信信息
 	response, err := utils.NewHttpClient().GetWXUserInfoResponse(redPacket.UserId)
 	if err != nil {
@@ -170,6 +188,7 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	otherInfo := config.OtherInfo{Count: len(userlist)}
+	otherInfo.List = make([]config.OtherList, 0)
 	//获取明细微信信息列表
 	if len(userlist) > 0 {
 		response_list, err := utils.NewHttpClient().GetWXUserListResponse(userlist)
