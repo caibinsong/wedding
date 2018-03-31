@@ -261,7 +261,8 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var roomMsg map[string]interface{} = make(map[string]interface{})
-	err = json.Unmarshal([]byte(room_msg), roomMsg)
+	log.Println(room_msg)
+	err = json.Unmarshal([]byte(room_msg), &roomMsg)
 	if err != nil {
 		log.Println(err.Error())
 		EchoWXXML(w, http.StatusOK, "FAIL")
