@@ -124,11 +124,27 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	}
 	//{"weddingId":1,"chatroomId":1,"userId":1,"data":{"rp_id":1,"red_type":1},"msg":{"code":0}}
 
+	// roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
+	// 	"weddingId": speeding.WeddingId,
+	// 	"userId":    userid,
+	// 	"msg":       map[string]interface{}{"code": 0},
+	// 	"data":      map[string]interface{}{"rp_id": req.Data.RpId, "red_type": redPacket.RedPacketType}}
+	/////
+	roomMsg := map[string]interface{}{"rp_id": req.Data.RpId,
+		"type": redPacket.RedPacketType,
+		"wish": redPacket.Remark1}
+	bRoomMsg, err := json.Marshal(roomMsg)
+	if err != nil {
+		log.Println(err.Error())
+		Response.Msg = "广播失败"
+		return
+	}
+
 	roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
 		"weddingId": speeding.WeddingId,
 		"userId":    userid,
-		"msg":       map[string]interface{}{"code": 0},
-		"data":      map[string]interface{}{"rp_id": req.Data.RpId, "red_type": redPacket.RedPacketType}}
+		"msgType":   4,
+		"msg":       string(bRoomMsg)}
 	// roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
 	// 	"weddingId": speeding.WeddingId,
 	// 	"userId":    userid,
