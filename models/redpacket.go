@@ -92,7 +92,7 @@ func FindRedPacketParamsByRpId(rpId int64) ([]RedPacketParams, error) {
 
 func CheckUserRedPacket(userId int64, req *config.Req_RedPacket) (map[string]interface{}, error) {
 	resultMap := make(map[string]interface{})
-	rp, err := FindRedPacketInfoByRpId(userId)
+	rp, err := FindRedPacketInfoByRpId(req.Data.RpId)
 	if err != nil {
 		return nil, err
 	}
