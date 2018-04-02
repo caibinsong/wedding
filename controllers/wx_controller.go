@@ -35,7 +35,6 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = err.Error()
 		return
 	}
-	log.Println(userinfo)
 	//解析request中的数据
 	req := &config.Req_WXGenRedPacket{}
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
@@ -55,9 +54,7 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = err.Error()
 		return
 	}
-	log.Println(redFlash)
 	var genRedPacket *config.Req_GenRedPacket = &config.Req_GenRedPacket{Data: req.Data.Params}
-	log.Println(genRedPacket)
 	//把数据保存入库
 	result, bill_no, err := models.GenRedPacket(userid, redFlash, genRedPacket, false)
 	if err != nil {
@@ -75,7 +72,6 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "生成失败"
 		return
 	}
-	log.Println(bill_no, rsp)
 	Response.Data = map[string]string{"appId": config.GetConfig().AppId,
 		"signType":  "MD5",
 		"total_fee": fmt.Sprint(int64(redFlash.Money * 100)),
@@ -136,7 +132,6 @@ func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string
 		timestamp,
 		"MD5",
 		config.GetConfig().Key)
-	log.Println(rsp, err)
 	return rsp, PaySign, nonceStr, timestamp, err
 }
 
@@ -144,7 +139,6 @@ func checkRequest(req *config.WXPayNotifyReq) bool {
 	if req.Return_code == "SUCCESS" && req.Appid == config.GetConfig().AppId && req.Mch_id == config.GetConfig().MchId {
 		return true
 	}
-	log.Println("checkRequest err:", req.Return_code, req.Appid, req.Mch_id)
 	return false
 }
 
@@ -161,8 +155,6 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
-	log.Println(req.Out_trade_no)
-	log.Println(req)
 	rp_id, room_msg, err := ToJsonAttach(req.Attach)
 	if err != nil {
 		log.Println(err.Error())
@@ -173,16 +165,13 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
-	log.Println(room_msg)
 	var roomMsg map[string]interface{} = make(map[string]interface{})
-	log.Println(room_msg)
 	err = json.Unmarshal([]byte(room_msg), &roomMsg)
 	if err != nil {
 		log.Println(err.Error())
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
-	log.Println(roomMsg)
 
 	err = utils.NewHttpClient().RoomSvr(config.RoomSvr_ServerName, config.RoomSvr_MethodName, roomMsg)
 	if err != nil {

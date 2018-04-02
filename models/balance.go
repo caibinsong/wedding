@@ -264,8 +264,6 @@ func updateBalance(tx *gorm.DB, userid int64, balance float64, spendingid int64,
 	} else {
 		before, after, _balance = beforeBalance.RechargeNum, afterBalance.RechargeNum, balance
 	}
-	log.Println(beforeBalance)
-	log.Println(afterBalance)
 	//insert into balanceLog
 	balanceLog_balance := BalanceLog{UserId: userid,
 		BalanceId:     beforeBalance.Id,

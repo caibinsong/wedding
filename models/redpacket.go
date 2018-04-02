@@ -156,15 +156,11 @@ func repeatUser(userid, rp_id int64) (string, bool) {
 	if err != nil {
 		return "", false
 	}
-	log.Println(userid, getRedPacketUser)
 	return getRedPacketUser, in(getRedPacketUser, strconv.Itoa(int(userid)))
 }
 
 func in(all, one string) bool {
-	log.Println(one)
-	log.Println(all, one)
 	arr := strings.Split(all, ";")
-	log.Println(arr)
 	for _, v := range arr {
 		if v == one {
 			return true

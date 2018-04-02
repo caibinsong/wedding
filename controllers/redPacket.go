@@ -97,13 +97,12 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = err.Error()
 		return
 	}
-	b, err := models.QueryBalanceByUserId(userid)
+	_, err = models.QueryBalanceByUserId(userid)
 	if err != nil {
 		log.Println("balance 中未发现", userid, "用户", err.Error())
 		Response.Msg = "请先授权登录"
 		return
 	}
-	log.Println(b)
 	rp_params_id, money, err := models.GetRedPack(userid, req.Data.RpId)
 	if err != nil {
 		Response.Msg = err.Error()
@@ -187,7 +186,6 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "查询红包异常"
 		return
 	}
-	log.Println(redPacket)
 
 	//获取发红包人个人微信信息
 	response, err := utils.NewHttpClient().GetWXUserInfoResponse(redPacket.UserId)
@@ -211,13 +209,10 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "查询红包异常"
 		return
 	}
-	log.Println(list)
 	userlist := make([]int, 0)
 	for _, one_user := range list {
 		userlist = append(userlist, int(one_user.UserId))
 	}
-	log.Println(userlist)
-	log.Println(len(userlist))
 	otherInfo := config.OtherInfo{Count: len(userlist)}
 	otherInfo.List = make([]config.OtherList, 0)
 	//获取明细微信信息列表
@@ -227,9 +222,6 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 			Response.Msg = "个人信息获取失败"
 			return
 		}
-		log.Println(response_list)
-		////////////////
-
 		for _, one_userId := range list {
 			for _, one := range response_list.Data {
 				if fmt.Sprint(one_userId.UserId) == one.Id {
@@ -244,20 +236,6 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		//////原来 OK//////////
-		// for k, one := range response_list.Data {
-		// 	if k >= len(list) {
-		// 		break
-		// 	}
-		// 	add := config.OtherList{UserId: list[k].UserId,
-		// 		NickName: one.NickName,
-		// 		Pic:      one.Pic,
-		// 		UpdateAt: list[k].UpdateAt,
-		// 		Money:    list[k].RedPacketMoney,
-		// 		Lucky:    list[k].Lucky}
-		// 	otherInfo.List = append(otherInfo.List, add)
-		// }
-		////
 	}
 	res_data.Other_Info = otherInfo
 	Response.Data = res_data

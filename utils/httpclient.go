@@ -27,7 +27,6 @@ func (this *HttpClient) Post(url string, header map[string]string, request inter
 	if err != nil {
 		return nil, fmt.Errorf("post request to json err: %v", err)
 	}
-	log.Println(string(reqBytes))
 	//创建request
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBytes))
 	if err != nil {
