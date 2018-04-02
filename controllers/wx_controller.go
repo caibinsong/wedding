@@ -105,7 +105,7 @@ func ToJsonAttach(msg string) (int, string, error) {
 		return 0, "", errors.New("红包不存在")
 	}
 	rst := fmt.Sprintf(`{"chatroomId":%s,"msgType":%s,"userId":%s,"weddingId":%s,"msg":"{\"rp_id\":%s,\"type\":%s,\"wish\":\"%s\",\"question\": \"%s\"}"}`,
-		arr[4], arr[7], arr[6], arr[5], arr[1], arr[2], arr[3], redpacket.Question)
+		arr[4], arr[7], arr[6], arr[5], arr[1], arr[2], arr[3], strings.Replace(redpacket.Question, "\"", "\\\"", -1))
 	return rp_id, rst, nil
 }
 
