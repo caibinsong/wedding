@@ -137,6 +137,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		"weddingId": speeding.WeddingId,
 		"userId":    userid,
 		"data":      string(bRoomMsg),
+		"msgType":   2,
 		"msg":       "{\"code\":0,\"msg\":\"\",\"data\":\"\"}"}
 	err = utils.NewHttpClient().RoomSvr(roomSvr)
 	if err != nil {
