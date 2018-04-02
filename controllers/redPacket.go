@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/models"
 	"github.com/caibinsong/wedding/utils"
@@ -125,8 +126,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 
 	/////广播
 	roomMsg := map[string]interface{}{"rp_id": req.Data.RpId,
-		"type": redPacket.RedPacketType,
-		"wish": redPacket.Remark1}
+		"type": redPacket.RedPacketType}
 	bRoomMsg, err := json.Marshal(roomMsg)
 	if err != nil {
 		log.Println(err.Error())
@@ -136,7 +136,8 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
 		"weddingId": speeding.WeddingId,
 		"userId":    userid,
-		"msg":       string(bRoomMsg)}
+		"data":      string(bRoomMsg),
+		"msg":       "{\"code\":0,\"msg\":\"\",\"data\":\"\"}"}
 	err = utils.NewHttpClient().RoomSvr(roomSvr)
 	if err != nil {
 		Response.Msg = err.Error()
@@ -206,24 +207,36 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Println(response_list)
-		// for _, one_userId := range userlist {
-		// 	for _, one := range response_list.Data {
-		// 		if one_userId==one.
-		// 	}
-		// }
+		////////////////
 
-		for k, one := range response_list.Data {
-			if k >= len(list) {
-				break
+		for _, one_userId := range list {
+			for _, one := range response_list.Data {
+				if fmt.Sprint(one_userId.UserId) == one.Id {
+					add := config.OtherList{UserId: one_userId.UserId,
+						NickName: one.NickName,
+						Pic:      one.Pic,
+						UpdateAt: one_userId.UpdateAt,
+						Money:    one_userId.RedPacketMoney,
+						Lucky:    one_userId.Lucky}
+					otherInfo.List = append(otherInfo.List, add)
+					break
+				}
 			}
-			add := config.OtherList{UserId: list[k].UserId,
-				NickName: one.NickName,
-				Pic:      one.Pic,
-				UpdateAt: list[k].UpdateAt,
-				Money:    list[k].RedPacketMoney,
-				Lucky:    list[k].Lucky}
-			otherInfo.List = append(otherInfo.List, add)
 		}
+		//////原来 OK//////////
+		// for k, one := range response_list.Data {
+		// 	if k >= len(list) {
+		// 		break
+		// 	}
+		// 	add := config.OtherList{UserId: list[k].UserId,
+		// 		NickName: one.NickName,
+		// 		Pic:      one.Pic,
+		// 		UpdateAt: list[k].UpdateAt,
+		// 		Money:    list[k].RedPacketMoney,
+		// 		Lucky:    list[k].Lucky}
+		// 	otherInfo.List = append(otherInfo.List, add)
+		// }
+		////
 	}
 	res_data.Other_Info = otherInfo
 	Response.Data = res_data

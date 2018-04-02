@@ -65,29 +65,8 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "生成失败"
 		return
 	}
-	////
-	//生成roomsvr 广播信息
-	// roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"]}
-	// bRoomMsg, err := json.Marshal(roomMsg)
-	// if err != nil {
-	// 	log.Println(err.Error())
-	// 	Response.Msg = "生成广播失败"
-	// 	return
-	// }
 
-	// roomSvr := map[string]interface{}{"chatroomId": req.Data.RoomId,
-	// 	"weddingId": req.Data.WeddingId,
-	// 	"userId":    userid,
-	// 	"msgType":   4,
-	// 	"msg":       string(bRoomMsg)}
-	// bAttach, err := json.Marshal(roomSvr)
-	// if err != nil {
-	// 	log.Println(err.Error())
-	// 	Response.Msg = "生成广播失败"
-	// 	return
-	// }
 	attach := ToSimpleAttach(result["rp_id"].(int64), req.Data.Params.RedPacketType, result["wish"].(string), req.Data.Params.RoomId, req.Data.Params.WeddingId, userid, 4)
-	/////
 	//
 	rsp, paySign, nonceStr, timestamp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100),
 		userinfo.Data.OpenId, attach)
@@ -151,13 +130,7 @@ func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string
 		log.Println("mch pay unified order error: ", err)
 		return nil, "", "", "", err
 	}
-	// registerInfo.WxJsApiParams = WxJsApiParams{
-	// 	AppId:     self.l.cfg.ReadingOauth.ReadingWxAppId,
-	// 	TimeStamp: fmt.Sprintf("%d", time.Now().Unix()),
-	// 	NonceStr:  string(rand.NewHex()),
-	// 	Package:   fmt.Sprintf("prepay_id=%s", unifiedRsp.PrepayId),
-	// 	SignType:  ,
-	// }
+
 	timestamp := fmt.Sprintf("prepay_id=%s", rsp.PrepayId)
 	PaySign := core.JsapiSign(config.GetConfig().AppId, timestamp, nonceStr,
 		timestamp,
@@ -165,43 +138,6 @@ func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string
 		config.GetConfig().Key)
 	log.Println(rsp, err)
 	return rsp, PaySign, nonceStr, timestamp, err
-	///////
-	// var req map[string]string = map[string]string{"appid": config.GetConfig().AppId,
-	// 	"attach":           attach,
-	// 	"body":             "<![CDATA[微信支付充值]]>",
-	// 	"goods_tag":        "<![CDATA[微信支付充值]]></goods_tag>",
-	// 	"mch_id":           config.GetConfig().MchId,
-	// 	"nonce_str":        utils.GetMd5String(fmt.Sprintf("%d", time.Now().Unix())),
-	// 	"notify_url":       config.GetConfig().NotifyUrl,
-	// 	"openid":           code,
-	// 	"out_trade_no":     strings.Replace(guid, "-", "", -1),
-	// 	"spbill_create_ip": config.GetConfig().SpbillCreateIp,
-	// 	"total_fee":        fmt.Sprint(money),
-	// 	"trade_type":       "JSAPI"}
-
-	// client := core.NewClient(config.GetConfig().AppId, config.GetConfig().MchId, config.GetConfig().Key, nil)
-	// response, err := client.PostXML("https://api.mch.weixin.qq.com/pay/unifiedorder", req)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	return nil, err
-	// }
-	// if response["result_code"] != "SUCCESS" {
-	// 	return nil, fmt.Errorf(response["return_msg"])
-	// }
-	// return response, nil
-	/*
-		map[
-			result_code:SUCCESS
-			prepay_id:wx2018032715431048c68a7d400519433148
-			mch_id:1456793102
-			nonce_str:CXZ97FTxhjuOZQ9Q
-			appid:wx1e16505b46f55fc3
-			sign:7F543FAEA02907787230C5158FF10257
-			trade_type:JSAPI
-			return_code:SUCCESS
-			return_msg:OK
-		] <nil>
-	*/
 }
 
 func checkRequest(req *config.WXPayNotifyReq) bool {
@@ -212,30 +148,6 @@ func checkRequest(req *config.WXPayNotifyReq) bool {
 	return false
 }
 
-// //pay_target=redpacket;rpid=1;roomsvr={fdsafa:aa}  解析出rpid 和 roomsvr广播的信息
-// func parsAttach(attach string) (int, string, error) {
-// 	if !strings.HasPrefix(attach, config.ATTR_STR) {
-// 		return 0, "", fmt.Errorf("Attach error : %s", attach)
-// 	}
-// 	attach = attach[len(config.ATTR_STR):]
-// 	index := strings.Index(attach, ";")
-// 	if index <= 0 {
-// 		return 0, "", fmt.Errorf("Attach error : %s", attach)
-// 	}
-// 	str_rp_id := attach[:index]
-// 	rp_id, err := strconv.Atoi(str_rp_id)
-// 	if err != nil {
-// 		log.Println(err.Error())
-// 		return 0, "", err
-// 	}
-// 	index = strings.Index(attach, config.ROOM_SVR)
-// 	if index <= 0 {
-// 		return 0, "", fmt.Errorf("Attach error : %s", attach)
-// 	}
-// 	return rp_id, attach[index+len(config.ROOM_SVR):], nil
-// }
-
-//
 func CallBack(w http.ResponseWriter, r *http.Request) {
 	req := &config.WXPayNotifyReq{}
 	err := xml.NewDecoder(r.Body).Decode(req)
@@ -249,7 +161,6 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		EchoWXXML(w, http.StatusOK, "FAIL")
 		return
 	}
-	log.Println()
 	log.Println(req.Out_trade_no)
 	log.Println(req)
 	rp_id, room_msg, err := ToJsonAttach(req.Attach)
