@@ -11,10 +11,11 @@ import (
 	//"math/big"
 	//"github.com/jinzhu/gorm"
 	//"time"
-	"errors"
-	"fmt"
-	"regexp"
-	"strconv"
+	//"errors"
+	//"fmt"
+	"github.com/caibinsong/wedding/controllers"
+	//"regexp"
+	//"strconv"
 )
 
 // roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"]}
@@ -40,8 +41,7 @@ import (
 //roomsvr=
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-	attach := ToSimpleAttach(1, 2, "答案答案答案答案答案答案答案",
-		3, 4, 5, 6)
+	attach := controllers.ToSimpleAttach("ri=(.*?);rt=(.*?);wh=(.*?);ci=(.*?);wi=1;ui=1;mt=1;")
 	log.Println(attach, len(attach))
 	log.Println(ToJsonAttach(attach))
 	//config.InitConfig()
