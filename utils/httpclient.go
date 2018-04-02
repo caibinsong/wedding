@@ -115,10 +115,10 @@ func (this *HttpClient) GetWXUserListResponse(userlist []int) (*config.WXUserLis
 }
 
 //广播服务
-func (this *HttpClient) RoomSvr(data map[string]interface{}) error {
+func (this *HttpClient) RoomSvr(methodname string, data map[string]interface{}) error {
 	//头部信息
 	var header map[string]string = map[string]string{"ServerName": config.RoomSvr_ServerName,
-		"MethodName": RoomSvr_Broadcast}
+		"MethodName": methodname}
 
 	//发送post请求
 	resp, err := this.Post(config.GetConfig().RoomSvrUrl, header, data)
