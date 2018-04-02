@@ -183,7 +183,8 @@ func CallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println(roomMsg)
-	err = utils.NewHttpClient().RoomSvr(config.RoomSvr_MethodName, roomMsg)
+
+	err = utils.NewHttpClient().RoomSvr(config.RoomSvr_ServerName, config.RoomSvr_MethodName, roomMsg)
 	if err != nil {
 		log.Println(err.Error())
 		EchoWXXML(w, http.StatusOK, "FAIL")

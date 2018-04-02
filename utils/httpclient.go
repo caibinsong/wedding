@@ -115,9 +115,9 @@ func (this *HttpClient) GetWXUserListResponse(userlist []int) (*config.WXUserLis
 }
 
 //广播服务
-func (this *HttpClient) RoomSvr(methodname string, data map[string]interface{}) error {
+func (this *HttpClient) RoomSvr(serverName, methodname string, data map[string]interface{}) error {
 	//头部信息
-	var header map[string]string = map[string]string{"ServerName": config.RoomSvr_ServerName,
+	var header map[string]string = map[string]string{"ServerName": serverName,
 		"MethodName": methodname}
 
 	//发送post请求

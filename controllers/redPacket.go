@@ -63,7 +63,9 @@ func GenRedPacket(w http.ResponseWriter, r *http.Request) {
 		"userId":    userid,
 		"msgType":   4,
 		"msg":       string(bRoomMsg)}
-	err = utils.NewHttpClient().RoomSvr(config.RoomSvr_MethodName, roomSvr)
+	//	//config.RoomSvr_ServerName   AccessCtrl Broadcast
+
+	err = utils.NewHttpClient().RoomSvr(config.RoomSvr_ServerName, config.RoomSvr_MethodName, roomSvr)
 	if err != nil {
 		Response.Msg = err.Error()
 		return
@@ -138,7 +140,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		"userId":    userid,
 		"data":      string(bRoomMsg),
 		"msg":       "{\"code\":0}"}
-	err = utils.NewHttpClient().RoomSvr(config.RoomSvr_Broadcast, roomSvr)
+	err = utils.NewHttpClient().RoomSvr("AccessCtrl", config.RoomSvr_Broadcast, roomSvr)
 	if err != nil {
 		Response.Msg = err.Error()
 		return
