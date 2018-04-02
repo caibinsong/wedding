@@ -49,8 +49,14 @@ func GenRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = err.Error()
 		return
 	}
+	_bQuestion, err := json.Marshal(req.Data.Question)
+	if err != nil {
+		log.Println(err.Error())
+		Response.Msg = "广播失败"
+		return
+	}
 	//发送roomsvr 广播
-	roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"]}
+	roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"], "question": string(_bQuestion)}
 	bRoomMsg, err := json.Marshal(roomMsg)
 	if err != nil {
 		log.Println(err.Error())
