@@ -7,6 +7,11 @@ type Response struct {
 	Data interface{} `json:"data,omitempty"` //返回内容
 }
 
+type ResponseRoomSvr struct {
+	Code int64 `json:"code"`
+	Data int64 `json:"data"`
+}
+
 //获取发红包人信息与抢红包人的信息
 type Res_GetRedPacketInfo struct {
 	RpId       int64     `json:"rp_id"`
