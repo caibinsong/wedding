@@ -141,7 +141,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		"userId":    userid,
 		"data":      roomMsg,
 		"msg":       msgstruct}
-	err = utils.NewHttpClient().RoomSvr("AccessCtrl", config.RoomSvr_Broadcast, roomSvr)
+	err = utils.NewHttpClient().AccessCtrlSvr("AccessCtrl", config.RoomSvr_Broadcast, roomSvr)
 	if err != nil {
 		Response.Msg = err.Error()
 		return

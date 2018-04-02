@@ -130,6 +130,36 @@ func (this *HttpClient) RoomSvr(serverName, methodname string, data map[string]i
 	defer resp.Body.Close()
 
 	//解析返回信息
+	var response *config.Response = &config.Response{}
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		log.Println("json decode error: ", err)
+		return fmt.Errorf("广播失败")
+	}
+
+	//判断是否成功
+	if response.Code != 0 {
+		log.Println("login robot result code error: ", response.Code, response.Msg)
+		return errors.New(fmt.Sprint(response.Code))
+	}
+	return nil
+}
+
+//广播服务
+func (this *HttpClient) AccessCtrlSvr(serverName, methodname string, data map[string]interface{}) error {
+	//头部信息
+	var header map[string]string = map[string]string{"ServerName": serverName,
+		"MethodName": methodname}
+
+	//发送post请求
+	resp, err := this.Post(config.GetConfig().RoomSvrUrl, header, data)
+	if err != nil {
+		log.Println(err.Error())
+		return fmt.Errorf("广播失败")
+	}
+	defer resp.Body.Close()
+
+	//解析返回信息
 	var response *config.ResponseRoomSvr = &config.ResponseRoomSvr{}
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
