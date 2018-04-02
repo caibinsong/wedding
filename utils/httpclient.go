@@ -149,8 +149,7 @@ func (this *HttpClient) RoomSvr(serverName, methodname string, data map[string]i
 func (this *HttpClient) AccessCtrlSvr(serverName, methodname string, data map[string]interface{}) error {
 	//头部信息
 	var header map[string]string = map[string]string{"ServerName": serverName,
-		"MethodName":   methodname,
-		"Content-Type": "text/plain",
+		"MethodName": methodname,
 	}
 
 	//发送post请求

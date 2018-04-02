@@ -137,9 +137,15 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		"data":      data,
 		"msg":       msg}
 
+	bRoomSvr, err := json.Marshal(map[string]interface{}{"msg": roomSvr})
+	if err != nil {
+		log.Println(err.Error())
+		Response.Msg = "广播失败"
+		return
+	}
 	content := map[string]interface{}{
 		"type":    2,
-		"content": map[string]interface{}{"msg": roomSvr},
+		"content": string(bRoomSvr),
 	}
 	bContent, err := json.Marshal(content)
 	if err != nil {
