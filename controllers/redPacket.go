@@ -145,7 +145,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	}
 	body := map[string]interface{}{
 		"type":    "HLBUser",
-		"idList":  userid,
+		"idList":  []int64{userid},
 		"content": string(bRoomMsg),
 	}
 
