@@ -129,17 +129,18 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	/////广播
 	roomMsg := map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}
-	bRoomMsg, err := json.Marshal(roomMsg)
-	if err != nil {
-		log.Println(err.Error())
-		Response.Msg = "广播失败"
-		return
-	}
+	// bRoomMsg, err := json.Marshal(roomMsg)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	Response.Msg = "广播失败"
+	// 	return
+	// }
+	msgstruct := map[string]interface{}{"code": 0}
 	roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
 		"weddingId": speeding.WeddingId,
 		"userId":    userid,
-		"data":      string(bRoomMsg),
-		"msg":       "{\"code\":0}"}
+		"data":      roomMsg,
+		"msg":       msgstruct}
 	err = utils.NewHttpClient().RoomSvr("AccessCtrl", config.RoomSvr_Broadcast, roomSvr)
 	if err != nil {
 		Response.Msg = err.Error()
