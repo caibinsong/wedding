@@ -117,7 +117,6 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "红包已经抢完！"
-		return
 	}
 
 	redPacket := models.FindRedPacketByRpId(req.Data.RpId)
@@ -127,14 +126,17 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "广播失败"
-		return
 	}
 
 	/////广播
 	data := map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}
-
-	msg := map[string]interface{}{"code": 0}
+	var msg map[string]interface{}
+	if Response.Msg == "" {
+		msg = map[string]interface{}{"code": 0}
+	} else {
+		msg = map[string]interface{}{"code": 1, "msg": Response.Msg}
+	}
 	roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
 		"weddingId": speeding.WeddingId,
 		"userId":    userid,
