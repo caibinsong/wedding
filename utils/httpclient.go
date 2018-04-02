@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/caibinsong/wedding/config"
 	"log"
@@ -129,7 +130,7 @@ func (this *HttpClient) RoomSvr(serverName, methodname string, data map[string]i
 	defer resp.Body.Close()
 
 	//解析返回信息
-	var response *config.Response = &config.Response{}
+	var response *config.ResponseRoomSvr = &config.ResponseRoomSvr{}
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
 		log.Println("json decode error: ", err)
@@ -138,8 +139,8 @@ func (this *HttpClient) RoomSvr(serverName, methodname string, data map[string]i
 
 	//判断是否成功
 	if response.Code != 0 {
-		log.Println("login robot result code error: ", response.Code, response.Msg)
-		return fmt.Errorf(response.Msg)
+		log.Println("login robot result code error: ", response.Code, response.Data)
+		return errors.New(fmt.Sprint(response.Code))
 	}
 	return nil
 }
