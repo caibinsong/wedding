@@ -113,7 +113,6 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = err.Error()
-		return
 	} else {
 		err = models.GrabRedPacket(userid, req.Data.RpId, int64(rp_params_id), money)
 		if err != nil {
