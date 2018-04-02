@@ -137,7 +137,11 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		"data":      roomMsg,
 		"msg":       msgstruct}
 
-	bRoomMsg, err := json.Marshal(roomSvr)
+	content := map[string]interface{}{
+		"type":    2,
+		"content": roomSvr,
+	}
+	bContent, err := json.Marshal(content)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = "广播失败"
@@ -146,7 +150,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 	body := map[string]interface{}{
 		"type":    "HLBUser",
 		"idList":  []int64{userid},
-		"content": string(bRoomMsg),
+		"content": string(bContent),
 	}
 
 	err = utils.NewHttpClient().AccessCtrlSvr("AccessCtrl", config.RoomSvr_Broadcast, body)

@@ -12,7 +12,7 @@ const (
 	WX_GetUserList     = "getUserList"
 	RoomSvr_ServerName = "Chatroom"
 	RoomSvr_MethodName = "SendMessage"
-	RoomSvr_Broadcast  = "BroadcastMessage"
+	RoomSvr_Broadcast  = "Broadcast"
 	RESPONSE_OK        = 0
 	RESPONSE_ERROR     = 1
 	ERROR_MSG          = "系统错误"

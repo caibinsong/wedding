@@ -163,7 +163,7 @@ func (this *HttpClient) AccessCtrlSvr(serverName, methodname string, data map[st
 	var response *config.ResponseRoomSvr = &config.ResponseRoomSvr{}
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		log.Println("json decode error: ", err)
+		log.Println("json decode has error: ", err)
 		return fmt.Errorf("广播失败")
 	}
 
