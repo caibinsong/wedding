@@ -99,8 +99,13 @@ func ToJsonAttach(msg string) (int, string, error) {
 	if err != nil {
 		return 0, "", errors.New("数据不正确")
 	}
-	rst := fmt.Sprintf(`{"chatroomId":%s,"msgType":%s,"userId":%s,"weddingId":%s,"msg":"{\"rp_id\":%s,\"type\":%s,\"wish\":\"%s\"}"}`,
-		arr[4], arr[7], arr[6], arr[5], arr[1], arr[2], arr[3])
+	redpacket, err := models.FindRedPacketInfoByRpId(int64(rp_id))
+	if err != nil {
+		log.Println(err.Error())
+		return 0, "", errors.New("红包不存在")
+	}
+	rst := fmt.Sprintf(`{"chatroomId":%s,"msgType":%s,"userId":%s,"weddingId":%s,"msg":"{\"rp_id\":%s,\"type\":%s,\"wish\":\"%s\","question": "%s"}"}`,
+		arr[4], arr[7], arr[6], arr[5], arr[1], arr[2], arr[3], redpacket.Question)
 	return rp_id, rst, nil
 }
 
