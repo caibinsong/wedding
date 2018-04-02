@@ -201,11 +201,16 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 		log.Println("redis set failed:", err)
 		return resultMap, bill_no, ERROR_DB_ACTION
 	}
+	_bQuestion, err := json.Marshal(req.Data.Question)
+	if err != nil {
+		log.Println("redis set failed:", err)
+		return resultMap, bill_no, ERROR_DB_ACTION
+	}
 	//返回Map
 	resultMap = map[string]interface{}{"rp_id": redPacket.RpId,
 		"guid":     redPacket.Guid,
 		"wish":     req.Data.Wish,
-		"question": req.Data.Question}
+		"question": string(_bQuestion)}
 	tx.Commit()
 	tx = nil
 	return resultMap, bill_no, nil
