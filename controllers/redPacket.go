@@ -70,9 +70,6 @@ func GenRedPacket(w http.ResponseWriter, r *http.Request) {
 		"msgType":   4,
 		"msg":       string(bRoomMsg)}
 	//	//config.RoomSvr_ServerName   AccessCtrl Broadcast
-	log.Println(roomSvr)
-	b, err := json.Marshal(roomSvr)
-	log.Println(string(b), err)
 	err = utils.NewHttpClient().RoomSvr(config.RoomSvr_ServerName, config.RoomSvr_MethodName, roomSvr)
 	if err != nil {
 		Response.Msg = err.Error()

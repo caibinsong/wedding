@@ -1,4 +1,0 @@
-2018/04/02 14:39:58 redPacket.go:73: map[weddingId:1 userId:1 msgType:4 msg:{"question":"{\"title\":\"\",\"key\":1,\"question\":[\"答案1\",\"答案2\",\"答案3\"]}","rp_id":12,"type":1,"wish":""} chatroomId:1]
-2018/04/02 14:39:58 redPacket.go:75: {"chatroomId":1,"msg":"{\"question\":\"{\\\"title\\\":\\\"\\\",\\\"key\\\":1,\\\"question\\\":[\\\"答案1\\\",\\\"答案2\\\",\\\"答案3\\\"]}\",\"rp_id\":12,\"type\":1,\"wish\":\"\"}","msgType":4,"userId":1,"weddingId":1} <nil>
-2018/04/02 14:39:59 httpclient.go:141: login robot result code error:  10000 该用户不在房间内
-2018/04/02 14:39:59 api.go:66: Request MethodName: [genRedPacket], Rtime[348.068ms]
