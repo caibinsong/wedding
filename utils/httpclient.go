@@ -152,13 +152,12 @@ func (this *HttpClient) AccessCtrlSvr(serverName, methodname string, data map[st
 		"MethodName": methodname}
 
 	//发送post请求
-	resp, err := this.Post(config.GetConfig().RoomSvrUrl, header, data)
+	resp, err := this.Post("http://172.17.0.13:7777/rpc", header, data)
 	if err != nil {
 		log.Println(err.Error())
 		return fmt.Errorf("广播失败")
 	}
 	defer resp.Body.Close()
-
 	//解析返回信息
 	var response *config.ResponseRoomSvr = &config.ResponseRoomSvr{}
 	err = json.NewDecoder(resp.Body).Decode(&response)
