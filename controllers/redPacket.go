@@ -108,17 +108,20 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "请先授权登录"
 		return
 	}
+	log.Println(0)
 	rp_params_id, money, err := models.GetRedPack(userid, req.Data.RpId)
 	if err != nil {
+		log.Println(err.Error())
 		Response.Msg = err.Error()
 		return
+	} else {
+		err = models.GrabRedPacket(userid, req.Data.RpId, int64(rp_params_id), money)
+		if err != nil {
+			log.Println(err.Error())
+			Response.Msg = "红包已经抢完！"
+		}
 	}
-	err = models.GrabRedPacket(userid, req.Data.RpId, int64(rp_params_id), money)
-	if err != nil {
-		log.Println(err.Error())
-		Response.Msg = "红包已经抢完！"
-	}
-
+	log.Println(1)
 	redPacket := models.FindRedPacketByRpId(req.Data.RpId)
 	Response.Data = map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}
@@ -128,6 +131,7 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "广播失败"
 	}
 
+	log.Println(2)
 	/////广播
 	data := map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}
