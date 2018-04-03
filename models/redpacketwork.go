@@ -89,12 +89,9 @@ func StartAccessCtrWork(serverName, methodname string) {
 	accessCtrWork.ServerName = serverName
 	accessCtrWork.Methodname = methodname
 	accessCtrWork.Data = make(chan map[string]interface{})
-	//var wg *sync.WaitGroup = &sync.WaitGroup{}
 	for i := 0; i < 20; i++ {
 		go accessCtrWork.work(i)
-		//wg.Add(1)
 	}
-	//wg.Wait()
 }
 
 func AddAccessCtrWork(data map[string]interface{}) {
@@ -105,9 +102,11 @@ func (this *AccessCtrlWork) work(i int) {
 	defer func() {
 		log.Println("work", i, "is die")
 	}()
+	log.Println("AccessCtr", i, "work start")
+	httpClient := utils.NewHttpClient()
 	for {
 		data := <-this.Data
-		err := utils.NewHttpClient().AccessCtrlSvr(this.ServerName, this.Methodname, data)
+		err := httpClient.AccessCtrlSvr(this.ServerName, this.Methodname, data)
 		if err != nil {
 			log.Println(err)
 		}

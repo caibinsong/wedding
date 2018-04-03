@@ -168,11 +168,6 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		"idList":  []int64{userid},
 		"content": string(bContent),
 	}
-	// err = utils.NewHttpClient().AccessCtrlSvr("AccessCtrl", config.RoomSvr_Broadcast, body)
-	// if err != nil {
-	// 	Response.Msg = err.Error()
-	// 	return
-	// }
 	models.AddAccessCtrWork(body)
 	Response.Code = config.RESPONSE_OK
 }

@@ -4,11 +4,11 @@ import (
 	//"crypto/rand"
 	//"github.com/Amniversary/wedding-logic-redpacket/business"
 	//"github.com/caibinsong/wedding/config"
-	//"github.com/caibinsong/wedding/config"
+	"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/models"
 	//"encoding/json"
 	//"github.com/Amniversary/wedding-logic-redpacket/utils"
-	//"fmt"
+	"fmt"
 	"log"
 	"time"
 	//"math/big"
@@ -44,14 +44,14 @@ import (
 //roomsvr=
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-	go models.StartAccessCtrWork("aaaa", "bbbb")
-	log.Println(1)
-	for i := 0; i <= 10; i++ {
-		a := map[string]interface{}{"a": i}
-		models.AddAccessCtrWork(a)
-	}
-	log.Println(2)
-	time.Sleep(time.Second * 10)
+	// go models.StartAccessCtrWork("aaaa", "bbbb")
+	// log.Println(1)
+	// for i := 0; i <= 10; i++ {
+	// 	a := map[string]interface{}{"a": i}
+	// 	models.AddAccessCtrWork(a)
+	// }
+	// log.Println(2)
+	// time.Sleep(time.Second * 10)
 	// attach := controllers.ToSimpleAttach("ri=(.*?);rt=(.*?);wh=(.*?);ci=(.*?);wi=1;ui=1;mt=1;")
 	// log.Println(attach, len(attach))
 	// log.Println(ToJsonAttach(attach))
@@ -60,8 +60,8 @@ func main() {
 	// log.Println("start")
 	//num := 10
 	// log.Println("start")
-	// config.InitConfig()
-	// models.InitDataBase()
+	config.InitConfig()
+	models.InitDataBase()
 	// start := time.Now()
 	// log.Println(models.QueryBalanceByUserId(1))
 	// log.Println(time.Now().Sub(start))
@@ -111,16 +111,16 @@ func main() {
 	// tx.Commit()
 	// tx.Commit()
 	// log.Println("tx insert ", time.Now().Sub(start))
-	// start = time.Now()
-	// tx1 := models.GetDBObject().Begin()
-	// for i := 500; i < 1500; i++ {
-	// 	err := tx1.Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// }
-	// tx1.Commit()
-	// log.Println("tx insert ", time.Now().Sub(start))
+	start := time.Now()
+	tx1 := models.GetDBObject().Begin()
+	for i := 100; i < 800; i++ {
+		err := tx1.Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	tx1.Commit()
+	log.Println("tx insert ", time.Now().Sub(start))
 
 	// start = time.Now()
 	// tx1 := models.GetDBObject().Begin()
