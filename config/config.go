@@ -45,6 +45,7 @@ type Config struct {
 	WXUserInfoUrl  string `xml:"wxuserinfourl"`
 	WXUserListUrl  string `xml:"wxuserlisturl"`
 	RoomSvrUrl     string `xml:"roomsvrurl"`
+	AccessCtrlSvr  string `xml:"accessctrlsvr"`
 	AppId          string `xml:"appid"`
 	MchId          string `xml:"mchid"`
 	Key            string `xml:"key"`
@@ -55,14 +56,13 @@ type Config struct {
 var config *Config = nil
 
 func InitConfig() {
-
 	config = &Config{}
 	path, err := filepath.Abs(os.Args[0])
 	if err != nil {
 		log.Panic(err.Error())
 	}
 	config_path := filepath.Join(filepath.Dir(path), "config.xml")
-	log.Println(config_path)
+
 	byts, err := ioutil.ReadFile(config_path)
 	if err != nil {
 		log.Panic("读取config.xml出错", err.Error())

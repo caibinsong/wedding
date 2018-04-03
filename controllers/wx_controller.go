@@ -99,7 +99,7 @@ func ToJsonAttach(msg string) (int, string, error) {
 	if err != nil {
 		return 0, "", errors.New("数据不正确")
 	}
-	redpacket, err := models.FindRedPacketInfoByRpId(int64(rp_id))
+	redpacket, err := models.FindRedPacketByRpId(int64(rp_id))
 	if err != nil {
 		log.Println(err.Error())
 		return 0, "", errors.New("红包不存在")

@@ -108,7 +108,6 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "请先授权登录"
 		return
 	}
-	log.Println(0)
 	rp_params_id, money, err := models.GetRedPack(userid, req.Data.RpId)
 	if err != nil {
 		log.Println(err.Error())
@@ -120,8 +119,11 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 			Response.Msg = "红包已经抢完！"
 		}
 	}
-	log.Println(1)
-	redPacket := models.FindRedPacketByRpId(req.Data.RpId)
+	redPacket, err := models.FindRedPacketByRpId(req.Data.RpId)
+	if err != nil {
+		log.Println(err.Error())
+		Response.Msg = "红包已经抢完！"
+	}
 	Response.Data = map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}
 	speeding, err := models.QuerySpending(redPacket.UserId, redPacket.CreateAt)
@@ -130,7 +132,6 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "广播失败"
 	}
 
-	log.Println(2)
 	/////广播
 	data := map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}
@@ -191,7 +192,7 @@ func GetRedPacketInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	res_data := &config.Res_GetRedPacketInfo{RpId: req.Data.RpId}
 	//查询红包信息
-	redPacket, err := models.FindRedPacketInfoByRpId(req.Data.RpId)
+	redPacket, err := models.FindRedPacketByRpId(req.Data.RpId)
 	if err != nil {
 		Response.Msg = "查询红包异常"
 		return

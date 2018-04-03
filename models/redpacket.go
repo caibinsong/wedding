@@ -41,6 +41,10 @@ type RedPacketParams struct {
 }
 
 const (
+	SQL_FindRedPacketByRpId       = "SELECT * FROM `cRedPacket`  WHERE `rp_id` = %d"
+	SQL_FindRedPacketParamsByRpId = "SELECT * FROM `cRedPacketParams`  WHERE (cRedPacketParams.rp_id=%d and cRedPacketParams.user_id<>0)"
+	SQL_UpRedPacketParams_Status  = "UPDATE `cRedPacketParams` SET `status` = 1  WHERE `rp_id` = %d"
+	SQL_UpRedPacket_Status        = "UPDATE `cRedPacket` SET `status` = 1  WHERE `rp_id` = %d"
 	//抢红包
 	GRAB_RED_PACKET        = "update  cRedPacket  set get_num=get_num+1  where rp_id=%d and `status`=1;"
 	GRAB_RED_PACKET_PARAMS = "update cRedPacketParams set user_id=%d, update_at=%d  where rp_id=%d and red_packet_no=%d and `status`=1"
@@ -56,7 +60,7 @@ func (RedPacketParams) TableName() string {
 
 //微信回调时 修改redpacket 和redpacketparams 的status状态
 func UpDateRedPacketStatus(rpId int64, Transaction_id string) error {
-	rp, err := FindRedPacketInfoByRpId(rpId)
+	rp, err := FindRedPacketByRpId(rpId)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -66,22 +70,21 @@ func UpDateRedPacketStatus(rpId int64, Transaction_id string) error {
 		log.Println(err.Error())
 		return err
 	}
-	err = db.Table("cRedPacketParams").Where(&RedPacketParams{RpId: rpId}).Updates(map[string]interface{}{"status": 1}).Error
+	err = db.Exec(fmt.Sprintf(SQL_UpRedPacketParams_Status, rpId)).Error
 	if err != nil {
 		log.Println(err.Error())
 	}
-	err = db.Table("cRedPacket").Where(&RedPacket{RpId: rpId}).Updates(map[string]interface{}{"status": 1}).Error
+	err = db.Exec(fmt.Sprintf(SQL_UpRedPacket_Status, rpId)).Error
 	if err != nil {
 		log.Println(err.Error())
-		return err
 	}
 	return err
 }
 
 //通过红包ID查询红包信息
-func FindRedPacketInfoByRpId(rpId int64) (RedPacket, error) {
+func FindRedPacketByRpId(rpId int64) (RedPacket, error) {
 	redPacket := RedPacket{}
-	err := db.Where(&RedPacket{RpId: rpId}).First(&redPacket).Error
+	err := db.Raw(fmt.Sprintf(SQL_FindRedPacketByRpId, rpId)).Scan(&redPacket).Error
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -91,18 +94,26 @@ func FindRedPacketInfoByRpId(rpId int64) (RedPacket, error) {
 //通过红包ID查询红包明细信息
 func FindRedPacketParamsByRpId(rpId int64) ([]RedPacketParams, error) {
 	redPacketParamsList := make([]RedPacketParams, 0)
-	err := db.Where(fmt.Sprintf("cRedPacketParams.rp_id=%d and cRedPacketParams.user_id<>0", rpId)).
-		Find(&redPacketParamsList).Error
-
+	rows, err := db.Raw(fmt.Sprintf(SQL_FindRedPacketParamsByRpId, rpId)).Rows()
+	defer rows.Close()
 	if err != nil {
 		log.Println(err.Error())
+	} else {
+		for rows.Next() {
+			redPacketParams := RedPacketParams{}
+			rows.Scan(&redPacketParams.ID, &redPacketParams.RpId, &redPacketParams.RedPacketNo,
+				&redPacketParams.RedPacketMoney, &redPacketParams.Status, &redPacketParams.Lucky,
+				&redPacketParams.UserId, &redPacketParams.UpdateAt, &redPacketParams.Remark1, &redPacketParams.Remark2)
+
+			redPacketParamsList = append(redPacketParamsList, redPacketParams)
+		}
 	}
 	return redPacketParamsList, nil
 }
 
 func CheckUserRedPacket(userId int64, req *config.Req_RedPacket) (map[string]interface{}, error) {
 	resultMap := make(map[string]interface{})
-	rp, err := FindRedPacketInfoByRpId(req.Data.RpId)
+	rp, err := FindRedPacketByRpId(req.Data.RpId)
 	if err != nil {
 		return nil, err
 	}
@@ -167,10 +178,4 @@ func in(all, one string) bool {
 		}
 	}
 	return false
-}
-
-func FindRedPacketByRpId(rpId int64) RedPacket {
-	redPacket := RedPacket{}
-	db.Where(&RedPacket{RpId: rpId}).First(&redPacket)
-	return redPacket
 }

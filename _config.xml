@@ -24,6 +24,7 @@
 
 	<!--广播地址-->
 	<roomsvrurl>https://access.hunlibaoapp.com/socket/response.do</roomsvrurl>
+	<accessctrlsvr>http://172.17.0.13:7777/rpc</accessctrlsvr>
 
 	<!--微信支付相关信息-->
 	<appid>wx1e16505b46f55fc3</appid>

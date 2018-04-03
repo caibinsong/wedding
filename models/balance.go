@@ -60,6 +60,12 @@ func (BalanceLog) TableName() string {
 	return "cBalanceLog"
 }
 
+const (
+	SQL_InsertRedPacketParams = "INSERT INTO `cRedPacketParams` (`rp_id`,`red_packet_no`,`red_packet_money`,`status`,`lucky`) VALUES (%d,%d,%.2f,%d,%d)"
+	SQL_QueryBalanceByUserId  = "SELECT * FROM cBalance  WHERE `user_id` = %d AND `status` = 1 LIMIT 1  "
+	//SQL_InsertSpending       = "INSERT INTO `cSpending` (`wedding_id`,`user_id`,`operate_type`,`money`,`create_time`,`status`,`op_unique_no`,`create_at`,`remark1`) VALUES (%d,%d,%d,%.2f,'%s',1,'%s',%d,'%s')  "
+)
+
 //抢红包
 func GrabRedPacket(user_id, rp_id, rp_params_id int64, money float64) error {
 	tx := db.Begin()
@@ -89,11 +95,12 @@ func GrabRedPacket(user_id, rp_id, rp_params_id int64, money float64) error {
 	return nil
 }
 
-//--------------------------------------------------------------------------------
-
 func QueryBalanceByUserId(userid int64) (*Balance, error) {
 	balance := &Balance{}
-	err := db.Where(&Balance{UserId: userid, Status: 1}).First(balance).Error
+	err := db.Raw(fmt.Sprintf(SQL_QueryBalanceByUserId, userid)).Scan(balance).Error
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return balance, err
 }
 
@@ -136,7 +143,7 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 		}
 		red_packet_status = 1
 	} else {
-		bill_no, err = InsertRecharge(userId, useNum.Money, opUniqueNo)
+		bill_no, err = InsertRecharge(userId, useNum.Money, opUniqueNo, now.Unix())
 		if err != nil {
 			return nil, bill_no, err
 		}
@@ -172,13 +179,8 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 		if i == int(useNum.IndexMax) {
 			isLuck = 1
 		}
-		redPacketParams := RedPacketParams{
-			RpId:           redPacket.RpId,
-			RedPacketNo:    int64(i + 1),
-			RedPacketMoney: useNum.ResultRedPacketData[i],
-			Status:         red_packet_status,
-			Lucky:          int64(isLuck)}
-		err = tx.Create(&redPacketParams).Error
+		err = tx.Exec(fmt.Sprintf(SQL_InsertRedPacketParams,
+			redPacket.RpId, int(i+1), useNum.ResultRedPacketData[i], red_packet_status, isLuck)).Error
 		if err != nil {
 			log.Println("inser into redpacketparams err:", err)
 			return resultMap, bill_no, ERROR_DB_ACTION
@@ -220,7 +222,7 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 func updateBalance(tx *gorm.DB, userid int64, balance float64, spendingid int64, now time.Time, opUniqueNo string) error {
 	//查询修改前 balance信息
 	beforeBalance := &Balance{}
-	err := tx.Where(&Balance{UserId: userid, Status: 1}).First(beforeBalance).Error
+	err := tx.Raw(fmt.Sprintf(SQL_QueryBalanceByUserId, userid)).Scan(beforeBalance).Error
 	if err != nil {
 		log.Println(err)
 		return ERROR_NOT_FIND_USER
@@ -257,7 +259,7 @@ func updateBalance(tx *gorm.DB, userid int64, balance float64, spendingid int64,
 	}
 	//查询修改后 balance信息
 	afterBalance := &Balance{}
-	err = tx.Where(&Balance{UserId: userid, Status: 1}).First(afterBalance).Error
+	err = tx.Raw(fmt.Sprintf(SQL_QueryBalanceByUserId, userid)).Scan(afterBalance).Error
 	if err != nil {
 		log.Println(err)
 		return ERROR_NOT_FIND_USER

@@ -51,14 +51,6 @@ func RunRpc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//userid，如果没有必须先授权
-	// userid := r.Header.Get("userid")
-	// if userid == "" {
-	// 	res.Code = 10002
-	// 	res.Msg = "用户未授权, 请授权小程序"
-	// 	EchoJson(w, http.StatusOK, res)
-	// 	return
-	// }
 	methodName := r.Header.Get("MethodName")
 
 	start := time.Now()

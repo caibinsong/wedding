@@ -8,12 +8,12 @@ import (
 	"github.com/caibinsong/wedding/models"
 	//"encoding/json"
 	//"github.com/Amniversary/wedding-logic-redpacket/utils"
-	//"fmt"
+	"fmt"
 	"log"
-	//"time"
+	"time"
 	//"math/big"
 	//"github.com/jinzhu/gorm"
-	"time"
+	//"time"
 	//"errors"
 	//"fmt"
 	//"github.com/caibinsong/wedding/controllers"
@@ -50,80 +50,60 @@ func main() {
 	//config.InitConfig()
 	//log.Println(config.GetConfig())
 	// log.Println("start")
-	//num := 10
+	num := 10
 	log.Println("start")
 	config.InitConfig()
 	models.InitDataBase()
+
 	start := time.Now()
-	log.Println(models.QueryBalanceByUserId(1))
-	log.Println(time.Now().Sub(start))
+	for i := num; i < num+50; i++ {
+		err := models.GetDBObject().Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	log.Println("insert ", time.Now().Sub(start))
+
 	start = time.Now()
-	log.Println(models.QueryBalanceByUserId1(1))
-	log.Println(time.Now().Sub(start))
+	for i := num + 50; i < num+100; i++ {
+		balance := models.Balance{UserId: int64(i), Status: 1}
+		err := models.GetDBObject().Create(&balance).Error
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	log.Println("create ", time.Now().Sub(start))
 
-	// start = time.Now()
-	// log.Println(models.QuerySpending(1, 1522469859))
-	// log.Println("insert ", time.Now().Sub(start))
-	// start := time.Now()
-	// for i := num; i < num+50; i++ {
-	// 	err := models.GetDBObject().Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// }
-	// log.Println("insert ", time.Now().Sub(start))
+	start = time.Now()
+	for i := num + 100; i < num+150; i++ {
+		err := models.GetDBObject().Create(&models.Balance{UserId: int64(i), Status: 1}).Error
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	log.Println(" create1 ", time.Now().Sub(start))
 
-	// start = time.Now()
-	// for i := num + 50; i < num+100; i++ {
-	// 	balance := models.Balance{UserId: int64(i), Status: 1}
-	// 	err := models.GetDBObject().Create(&balance).Error
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// }
-	// log.Println("create ", time.Now().Sub(start))
+	start = time.Now()
+	tx := models.GetDBObject().Begin()
+	for i := num + 150; i < num+200; i++ {
+		err := tx.Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	tx.Commit()
+	log.Println("tx insert ", time.Now().Sub(start))
 
-	// start = time.Now()
-	// for i := num + 100; i < num+150; i++ {
-	// 	err := models.GetDBObject().Create(&models.Balance{UserId: int64(i), Status: 1}).Error
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// }
-	// log.Println(" create1 ", time.Now().Sub(start))
-	// log.Println(num)
-	// start := time.Now()
-	// tx := models.GetDBObject().Begin()
-	// for i := 10; i < 500; i++ {
-	// 	err := tx.Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// }
-	// tx.Commit()
-	// tx.Commit()
-	// log.Println("tx insert ", time.Now().Sub(start))
-	// start = time.Now()
-	// tx1 := models.GetDBObject().Begin()
-	// for i := 500; i < 1500; i++ {
-	// 	err := tx1.Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// }
-	// tx1.Commit()
-	// log.Println("tx insert ", time.Now().Sub(start))
-
-	// start = time.Now()
-	// tx1 := models.GetDBObject().Begin()
-	// for i := num + 200; i < num+250; i++ {
-	// 	err := tx1.Create(&models.Balance{UserId: int64(i), Status: 1}).Error
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// }
-	// tx1.Commit()
-	// log.Println("tx create ", time.Now().Sub(start))
+	start = time.Now()
+	tx1 := models.GetDBObject().Begin()
+	for i := num + 200; i < num+250; i++ {
+		err := tx1.Create(&models.Balance{UserId: int64(i), Status: 1}).Error
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	tx1.Commit()
+	log.Println("tx create ", time.Now().Sub(start))
 
 	// //log.Println(models.GetRedPacketInfo(18))
 	// b0, err := models.QueryBalanceByUserId(1)

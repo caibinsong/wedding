@@ -1,5 +1,10 @@
 package models
 
+import (
+	"fmt"
+	"log"
+)
+
 type Spending struct {
 	Id          int64   `gorm:"primary_key" json:"id"`
 	WeddingId   int64   `gorm:"not null; default:0;  type:int" json:"wedding_id"`                 //婚礼ID
@@ -18,8 +23,16 @@ type Spending struct {
 func (Spending) TableName() string {
 	return "cSpending"
 }
+
+const (
+	SQL_QuerySpending = "SELECT * FROM `cSpending`  WHERE `user_id` = %d AND create_at = %d "
+)
+
 func QuerySpending(userid, createat int64) (*Spending, error) {
 	spending := &Spending{}
-	err := db.Table("cSpending").Where(&Spending{UserId: userid, CreateAt: createat}).First(spending).Error
+	err := db.Raw(fmt.Sprintf(SQL_QuerySpending, userid, createat)).Scan(&spending).Error
+	if err != nil {
+		log.Println(err, fmt.Sprintf(SQL_QuerySpending, userid, createat))
+	}
 	return spending, err
 }

@@ -40,7 +40,6 @@ func (this *HttpClient) Post(url string, header map[string]string, request inter
 			req.Header.Set(k, v)
 		}
 	}
-
 	//发送请求
 	return this.client.Do(req)
 }
@@ -152,7 +151,7 @@ func (this *HttpClient) AccessCtrlSvr(serverName, methodname string, data map[st
 	}
 
 	//发送post请求
-	resp, err := this.Post("http://172.17.0.13:7777/rpc", header, data)
+	resp, err := this.Post(config.GetConfig().AccessCtrlSvr, header, data)
 	if err != nil {
 		log.Println(err.Error())
 		return fmt.Errorf("广播失败")
