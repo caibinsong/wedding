@@ -24,6 +24,7 @@ func init() {
 	//数据库初始化
 	config.InitConfig()
 	models.InitDataBase()
+	models.StartAccessCtrWork("AccessCtrl", config.RoomSvr_Broadcast)
 	http.HandleFunc("/rpc", RunRpc)
 	http.HandleFunc("/wechat_callback", CallBack)
 }

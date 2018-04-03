@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"github.com/caibinsong/wedding/config"
+	"github.com/caibinsong/wedding/utils"
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"strconv"
@@ -11,9 +12,10 @@ import (
 )
 
 var (
-	work      *redPacketWork = &redPacketWork{}
-	getMutex  sync.Mutex
-	statusMap map[int]string = map[int]string{1: "红包已抢完", 2: "已经抢过红包了", 3: "红包已过期"}
+	work          *redPacketWork = &redPacketWork{}
+	getMutex      sync.Mutex
+	statusMap     map[int]string  = map[int]string{1: "红包已抢完", 2: "已经抢过红包了", 3: "红包已过期"}
+	accessCtrWork *AccessCtrlWork = &AccessCtrlWork{}
 )
 
 type redPacketWork struct {
@@ -75,4 +77,39 @@ func (this *redPacketWork) getRedPack(user_id, rp_id int64) (int, float64, error
 		}
 	}
 	return 0, 0, fmt.Errorf(statusMap[status])
+}
+
+type AccessCtrlWork struct {
+	ServerName string
+	Methodname string
+	Data       chan map[string]interface{}
+}
+
+func StartAccessCtrWork(serverName, methodname string) {
+	accessCtrWork.ServerName = serverName
+	accessCtrWork.Methodname = methodname
+	accessCtrWork.Data = make(chan map[string]interface{})
+	//var wg *sync.WaitGroup = &sync.WaitGroup{}
+	for i := 0; i < 20; i++ {
+		go accessCtrWork.work(i)
+		//wg.Add(1)
+	}
+	//wg.Wait()
+}
+
+func AddAccessCtrWork(data map[string]interface{}) {
+	accessCtrWork.Data <- data
+}
+
+func (this *AccessCtrlWork) work(i int) {
+	defer func() {
+		log.Println("work", i, "is die")
+	}()
+	for {
+		data := <-this.Data
+		err := utils.NewHttpClient().AccessCtrlSvr(this.ServerName, this.Methodname, data)
+		if err != nil {
+			log.Println(err)
+		}
+	}
 }

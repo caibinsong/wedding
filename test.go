@@ -4,16 +4,16 @@ import (
 	//"crypto/rand"
 	//"github.com/Amniversary/wedding-logic-redpacket/business"
 	//"github.com/caibinsong/wedding/config"
-	"github.com/caibinsong/wedding/config"
+	//"github.com/caibinsong/wedding/config"
 	"github.com/caibinsong/wedding/models"
 	//"encoding/json"
 	//"github.com/Amniversary/wedding-logic-redpacket/utils"
 	//"fmt"
 	"log"
-	//"time"
+	"time"
 	//"math/big"
 	//"github.com/jinzhu/gorm"
-	"time"
+	//"time"
 	//"errors"
 	//"fmt"
 	//"github.com/caibinsong/wedding/controllers"
@@ -44,6 +44,14 @@ import (
 //roomsvr=
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	go models.StartAccessCtrWork("aaaa", "bbbb")
+	log.Println(1)
+	for i := 0; i <= 10; i++ {
+		a := map[string]interface{}{"a": i}
+		models.AddAccessCtrWork(a)
+	}
+	log.Println(2)
+	time.Sleep(time.Second * 10)
 	// attach := controllers.ToSimpleAttach("ri=(.*?);rt=(.*?);wh=(.*?);ci=(.*?);wi=1;ui=1;mt=1;")
 	// log.Println(attach, len(attach))
 	// log.Println(ToJsonAttach(attach))
@@ -51,15 +59,15 @@ func main() {
 	//log.Println(config.GetConfig())
 	// log.Println("start")
 	//num := 10
-	log.Println("start")
-	config.InitConfig()
-	models.InitDataBase()
-	start := time.Now()
-	log.Println(models.QueryBalanceByUserId(1))
-	log.Println(time.Now().Sub(start))
-	start = time.Now()
-	log.Println(models.QueryBalanceByUserId1(1))
-	log.Println(time.Now().Sub(start))
+	// log.Println("start")
+	// config.InitConfig()
+	// models.InitDataBase()
+	// start := time.Now()
+	// log.Println(models.QueryBalanceByUserId(1))
+	// log.Println(time.Now().Sub(start))
+	// start = time.Now()
+	// log.Println(models.QueryBalanceByUserId1(1))
+	// log.Println(time.Now().Sub(start))
 
 	// start = time.Now()
 	// log.Println(models.QuerySpending(1, 1522469859))
