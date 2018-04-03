@@ -49,11 +49,11 @@ func post(id int) {
 		"MethodName":   "grabRedPacket",
 		"userid":       fmt.Sprint(id),
 		"Content-Type": "application/json"}
-	var data = map[string]interface{}{"rp_id": 64}
+	var data = map[string]interface{}{"rp_id": 188}
 	var request = map[string]interface{}{"action_name": "grab_red_packet",
 		"data": data}
-	//r, err := utils.NewHttpClient().Post("http://182.254.247.115:5501/rpc", hear, request)
-	r, err := utils.NewHttpClient().Post("http://127.0.0.1:5501/rpc", hear, request)
+	r, err := utils.NewHttpClient().Post("http://182.254.247.115:5501/rpc", hear, request)
+	//r, err := utils.NewHttpClient().Post("http://127.0.0.1:5501/rpc", hear, request)
 	if err != nil {
 		log.Println(err)
 		return
@@ -70,7 +70,7 @@ func post(id int) {
 
 }
 func main() {
-	for i := 100; i < 800; i++ { //843
+	for i := 100; i < 750; i++ { //843
 		go post(i)
 	}
 	time.Sleep(time.Second * 200)
