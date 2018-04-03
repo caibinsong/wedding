@@ -4,11 +4,11 @@ import (
 	//"crypto/rand"
 	//"github.com/Amniversary/wedding-logic-redpacket/business"
 	//"github.com/caibinsong/wedding/config"
-	"github.com/caibinsong/wedding/config"
-	"github.com/caibinsong/wedding/models"
+	//"github.com/caibinsong/wedding/config"
+	//"github.com/caibinsong/wedding/models"
 	//"encoding/json"
-	//"github.com/Amniversary/wedding-logic-redpacket/utils"
 	"fmt"
+	"github.com/caibinsong/wedding/utils"
 	"log"
 	"time"
 	//"math/big"
@@ -19,6 +19,8 @@ import (
 	//"github.com/caibinsong/wedding/controllers"
 	//"regexp"
 	//"strconv"
+	"io/ioutil"
+	"strings"
 )
 
 // roomMsg := map[string]interface{}{"rp_id": result["rp_id"], "type": req.Data.RedPacketType, "wish": result["wish"]}
@@ -42,8 +44,37 @@ import (
 
 //pay_target=redpacket;rpid=7;
 //roomsvr=
+func post(id int) {
+	var hear = map[string]string{"ServerName": "weddingRedPacket",
+		"MethodName":   "grabRedPacket",
+		"userid":       fmt.Sprint(id),
+		"Content-Type": "application/json"}
+	var data = map[string]interface{}{"rp_id": 64}
+	var request = map[string]interface{}{"action_name": "grab_red_packet",
+		"data": data}
+	//r, err := utils.NewHttpClient().Post("http://182.254.247.115:5501/rpc", hear, request)
+	r, err := utils.NewHttpClient().Post("http://127.0.0.1:5501/rpc", hear, request)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer r.Body.Close()
+	a, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if strings.Index(string(a), `"code":0`) > 0 {
+		log.Println(id)
+	}
+
+}
 func main() {
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	for i := 100; i < 800; i++ { //843
+		go post(i)
+	}
+	time.Sleep(time.Second * 200)
+	//log.SetFlags(log.Lshortfile | log.LstdFlags)
 	// go models.StartAccessCtrWork("aaaa", "bbbb")
 	// log.Println(1)
 	// for i := 0; i <= 10; i++ {
@@ -60,8 +91,8 @@ func main() {
 	// log.Println("start")
 	//num := 10
 	// log.Println("start")
-	config.InitConfig()
-	models.InitDataBase()
+	// config.InitConfig()
+	// models.InitDataBase()
 	// start := time.Now()
 	// log.Println(models.QueryBalanceByUserId(1))
 	// log.Println(time.Now().Sub(start))
@@ -111,16 +142,16 @@ func main() {
 	// tx.Commit()
 	// tx.Commit()
 	// log.Println("tx insert ", time.Now().Sub(start))
-	start := time.Now()
-	tx1 := models.GetDBObject().Begin()
-	for i := 100; i < 800; i++ {
-		err := tx1.Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
-		if err != nil {
-			log.Println(err)
-		}
-	}
-	tx1.Commit()
-	log.Println("tx insert ", time.Now().Sub(start))
+	// start := time.Now()
+	// tx1 := models.GetDBObject().Begin()
+	// for i := 100; i < 800; i++ {
+	// 	err := tx1.Exec(fmt.Sprintf("insert into cBalance(user_id,status) values(%d,1);", i)).Error
+	// 	if err != nil {
+	// 		log.Println(err)
+	// 	}
+	// }
+	// tx1.Commit()
+	// log.Println("tx insert ", time.Now().Sub(start))
 
 	// start = time.Now()
 	// tx1 := models.GetDBObject().Begin()

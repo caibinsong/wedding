@@ -143,6 +143,7 @@ func isEndStatus(rp_id int64) (string, bool) {
 	redPacket, err := redis.String(GetRedisDB().Do("GET",
 		fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
 	if err != nil {
+		log.Println(fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id), err)
 		return redPacket, true
 	}
 	return redPacket, false

@@ -97,27 +97,21 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "用户ID异常"
 		return
 	}
-	_, err := models.CheckUserRedPacket(userid, req)
-	if err != nil {
-		Response.Msg = err.Error()
-		return
-	}
-	_, err = models.QueryBalanceByUserId(userid)
-	if err != nil {
-		log.Println("balance 中未发现", userid, "用户", err.Error())
-		Response.Msg = "请先授权登录"
-		return
-	}
-	rp_params_id, money, err := models.GetRedPack(userid, req.Data.RpId)
+	// _, err := models.CheckUserRedPacket(userid, req)
+	// if err != nil {
+	// 	Response.Msg = err.Error()
+	// 	return
+	// }
+	// _, err = models.QueryBalanceByUserId(userid)
+	// if err != nil {
+	// 	log.Println("balance 中未发现", userid, "用户", err.Error())
+	// 	Response.Msg = "请先授权登录"
+	// 	return
+	// }
+	err := models.GetRedPack(userid, req.Data.RpId)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = err.Error()
-	} else {
-		err = models.GrabRedPacket(userid, req.Data.RpId, int64(rp_params_id), money)
-		if err != nil {
-			log.Println(err.Error())
-			Response.Msg = "红包已经抢完！"
-		}
 	}
 	redPacket, err := models.FindRedPacketByRpId(req.Data.RpId)
 	if err != nil {

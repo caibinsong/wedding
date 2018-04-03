@@ -7,7 +7,7 @@
 		<host>127.0.0.1</host>
 		<user>root</user>
 		<pass>123456</pass>
-		<debug>dev</debug>
+		<debug>dev1</debug>
 		<!--
 			wedding_card
 			172.17.0.5
