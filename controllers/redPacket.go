@@ -97,71 +97,60 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		Response.Msg = "用户ID异常"
 		return
 	}
-	// _, err := models.CheckUserRedPacket(userid, req)
-	// if err != nil {
-	// 	Response.Msg = err.Error()
-	// 	return
-	// }
-	// _, err = models.QueryBalanceByUserId(userid)
-	// if err != nil {
-	// 	log.Println("balance 中未发现", userid, "用户", err.Error())
-	// 	Response.Msg = "请先授权登录"
-	// 	return
-	// }
+
 	err := models.GetRedPack(userid, req.Data.RpId)
 	if err != nil {
 		log.Println(err.Error())
 		Response.Msg = err.Error()
 	}
-	redPacket, err := models.FindRedPacketByRpId(req.Data.RpId)
-	if err != nil {
-		log.Println(err.Error())
-		Response.Msg = "红包已经抢完！"
-	}
-	Response.Data = map[string]interface{}{"rp_id": req.Data.RpId,
-		"red_type": redPacket.RedPacketType}
-	speeding, err := models.QuerySpending(redPacket.UserId, redPacket.CreateAt)
-	if err != nil {
-		log.Println(err.Error())
-		Response.Msg = "广播失败"
-	}
-	/////广播
-	data := map[string]interface{}{"rp_id": req.Data.RpId,
-		"red_type": redPacket.RedPacketType}
-	var msg map[string]interface{}
-	if Response.Msg == "" {
-		msg = map[string]interface{}{"code": 0}
-	} else {
-		msg = map[string]interface{}{"code": 1, "msg": Response.Msg}
-	}
-	roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
-		"weddingId": speeding.WeddingId,
-		"userId":    userid,
-		"data":      data,
-		"msg":       msg}
+	// redPacket, err := models.FindRedPacketByRpId(req.Data.RpId)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	Response.Msg = "红包已经抢完！"
+	// }
+	Response.Data = map[string]interface{}{"rp_id": req.Data.RpId /*,"red_type": redPacket.RedPacketType*/}
+	// speeding, err := models.QuerySpending(redPacket.UserId, redPacket.CreateAt)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	Response.Msg = "广播失败"
+	// }
+	// /////广播
+	// data := map[string]interface{}{"rp_id": req.Data.RpId,
+	// 	"red_type": redPacket.RedPacketType}
+	// var msg map[string]interface{}
+	// if Response.Msg == "" {
+	// 	msg = map[string]interface{}{"code": 0}
+	// } else {
+	// 	msg = map[string]interface{}{"code": 1, "msg": Response.Msg}
+	// }
+	// roomSvr := map[string]interface{}{"chatroomId": redPacket.RoomId,
+	// 	"weddingId": speeding.WeddingId,
+	// 	"userId":    userid,
+	// 	"data":      data,
+	// 	"msg":       msg}
 
-	bRoomSvr, err := json.Marshal(map[string]interface{}{"msg": roomSvr})
-	if err != nil {
-		log.Println(err.Error())
-		Response.Msg = "广播失败"
-		return
-	}
-	content := map[string]interface{}{
-		"type":    2,
-		"content": string(bRoomSvr),
-	}
-	bContent, err := json.Marshal(content)
-	if err != nil {
-		log.Println(err.Error())
-		Response.Msg = "广播失败"
-		return
-	}
-	body := map[string]interface{}{
-		"type":    "HLBUser",
-		"idList":  []int64{userid},
-		"content": string(bContent),
-	}
-	models.AddAccessCtrWork(body)
+	// bRoomSvr, err := json.Marshal(map[string]interface{}{"msg": roomSvr})
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	Response.Msg = "广播失败"
+	// 	return
+	// }
+	// content := map[string]interface{}{
+	// 	"type":    2,
+	// 	"content": string(bRoomSvr),
+	// }
+	// bContent, err := json.Marshal(content)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	Response.Msg = "广播失败"
+	// 	return
+	// }
+	// body := map[string]interface{}{
+	// 	"type":    "HLBUser",
+	// 	"idList":  []int64{userid},
+	// 	"content": string(bContent),
+	// }
+	models.AddAccessCtrWork(models.AccessCtr{RpId: req.Data.RpId, UserId: userid})
 	Response.Code = config.RESPONSE_OK
 }
 

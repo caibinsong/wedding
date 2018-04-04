@@ -113,62 +113,56 @@ func FindRedPacketParamsByRpId(rpId int64) ([]RedPacketParams, error) {
 
 func CheckUserRedPacket(userId int64, req *config.Req_RedPacket) (map[string]interface{}, error) {
 	resultMap := make(map[string]interface{})
-	rp, err := FindRedPacketByRpId(req.Data.RpId)
-	if err != nil {
-		return nil, err
-	}
-	if rp.Status == 0 || time.Now().Unix() > (rp.CreateAt+config.ONE_DAY) {
-		resultMap["status"] = 3
-		return resultMap, nil
-	}
+
 	resultMap["status"] = CheckRedPacket(userId, req.Data.RpId)
 	return resultMap, nil
 }
 
 func CheckRedPacket(user_id, rp_id int64) int {
-	if _, ok := isEndStatus(rp_id); ok {
+	if isEndStatus(rp_id) {
 		return 3
 	}
-	if _, ok := hasRedPacket(rp_id); !ok {
+	if !hasRedPacket(rp_id) {
 		return 1
 	}
-	if _, ok := repeatUser(user_id, rp_id); ok {
+	if repeatUser(user_id, rp_id) {
 		return 2
 	}
 	return 0
 }
 
 //如果redis中 空就是 过期了
-func isEndStatus(rp_id int64) (string, bool) {
-	redPacket, err := redis.String(GetRedisDB().Do("GET",
-		fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
+func isEndStatus(rp_id int64) bool {
+	rp, err := FindRedPacketByRpId(rp_id)
 	if err != nil {
-		log.Println(fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id), err)
-		return redPacket, true
+		return true
 	}
-	return redPacket, false
+	if rp.Status == 0 || time.Now().Unix() > (rp.CreateAt+config.ONE_DAY) {
+		return true
+	}
+	return false
 }
 
 //判断红包是否还有
-func hasRedPacket(rp_id int64) (string, bool) {
+func hasRedPacket(rp_id int64) bool {
 	redPacket, err := redis.String(GetRedisDB().Do("GET",
 		fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
 	if err != nil {
-		return "", false
+		return false
 	}
 	if strings.Index(redPacket, "_") > 0 {
-		return "", true
+		return true
 	}
-	return "", false
+	return false
 }
 
 //判断红包是否已经抢过了
-func repeatUser(userid, rp_id int64) (string, bool) {
+func repeatUser(userid, rp_id int64) bool {
 	getRedPacketUser, err := redis.String(GetRedisDB().Do("GET", fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, rp_id)))
 	if err != nil {
-		return "", false
+		return false
 	}
-	return getRedPacketUser, in(getRedPacketUser, strconv.Itoa(int(userid)))
+	return in(getRedPacketUser, strconv.Itoa(int(userid)))
 }
 
 func in(all, one string) bool {
