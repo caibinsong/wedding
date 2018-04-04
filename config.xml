@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<!--服务名-->
+	<servername>weddingRedPacket</servername>
+	<mysql>
+		<dbname>cAuth</dbname>
+		<host>127.0.0.1</host>
+		<user>root</user>
+		<pass>123456</pass>
+		<debug>dev1</debug>
+		<!--
+			wedding_card
+			172.17.0.5
+			root
+			tkC42cwy2U3SQwHw
+			prod
+		-->
+	</mysql>
+	<redis>127.0.0.1:6379</redis>
+    <redispassword></redispassword>
+	<!--微信请求地址-->
+	<wxuserinfourl>http://172.17.16.3:5607/api/response.do</wxuserinfourl>
+	<wxuserlisturl>http://172.17.16.3:5607/api/response.do</wxuserlisturl>
+
+	<!--广播地址-->
+	<roomsvrurl>https://access.hunlibaoapp.com/socket/response.do</roomsvrurl>
+	<accessctrlsvr>http://172.17.0.13:7777/rpc</accessctrlsvr>
+
+	<!--微信支付相关信息-->
+	<appid>wx1e16505b46f55fc3</appid>
+	<mchid>1456793102</mchid>
+	<key>Ej1OlMdS54J8AfsZcmZGfYufNqYPSXuH</key>
+	<spbillcreateip>172.17.0.13</spbillcreateip>
+	<!--微信支付回调地址-->
+	<notifyurl>https://logic.hunlibaoapp.com/wxpay/wxpay_notify</notifyurl>
+	<!--end-->
+</config>
+
+

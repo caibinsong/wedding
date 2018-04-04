@@ -46,71 +46,36 @@ type RedPacketInfo struct {
 
 //校验数据合法性（包括余额是否足够）
 func (this *Req_WXGenRedPacket) CheckParameter() error {
-	if this.Data.Params.WeddingId <= 0 || this.Data.Params.RoomId <= 0 || this.Data.Params.RedPacketMoney <= 0 || this.Data.Params.RedPacketNum <= 0 {
-		return errors.New("参数不正确")
-	}
-	//红包个数
-	if this.Data.Params.RedPacketNum <= 0 || this.Data.Params.RedPacketNum > RED_PACKET_NUM_MAX {
-		return errors.New("红包个数不可超过200")
-	}
-	//红包类型与红包大小判断
-	if this.Data.Params.RedPacketType == GENERAL_RED_PACKET {
-		//普通红包
-		if this.Data.Params.RedPacketMoney <= 0 || this.Data.Params.RedPacketMoney > 200 {
-			return errors.New("单个红包不能大于200元")
-		}
-	} else if this.Data.Params.RedPacketType == LUCKY_RED_PACKET || this.Data.Params.RedPacketType == QUESTIONS_RED_PACKET {
-		//手气红包和答题红包
-		//单个红包不可小于0.01
-		if this.Data.Params.RedPacketMoney < (float64(this.Data.Params.RedPacketNum) * 0.01) {
-			return errors.New("单个红包不能小于0.01元")
-		}
-		//单个红包不可大于200
-		if this.Data.Params.RedPacketMoney*100 > (float64(this.Data.Params.RedPacketNum) * RED_PACKET_MAX) {
-			return errors.New("单个红包不能大于200元")
-		}
-	} else {
-		return errors.New("红包类型不正确")
-	}
-
-	//答题红包
-	if this.Data.Params.RedPacketType == QUESTIONS_RED_PACKET {
-		if this.Data.Params.Question.Title == "" {
-			return errors.New("答题红包，题目不可为空")
-		}
-		if len(this.Data.Params.Question.Question) < 2 {
-			return errors.New("答题红包，答案不可少于2个")
-		}
-		if this.Data.Params.Question.Key < 0 || this.Data.Params.Question.Key >= int64(len(this.Data.Params.Question.Question)) {
-			return errors.New("正确答案选择有误")
-		}
-	}
-	return nil
+	return ChechParameter(this.Data.Params)
 }
 
 //校验数据合法性（包括余额是否足够）
 func (this *Req_GenRedPacket) CheckParameter() error {
-	if this.Data.WeddingId <= 0 || this.Data.RoomId <= 0 || this.Data.RedPacketMoney <= 0 || this.Data.RedPacketNum <= 0 {
+	return ChechParameter(this.Data)
+}
+
+func ChechParameter(data RedPacketInfo) error {
+	if data.WeddingId <= 0 || data.RoomId <= 0 || data.RedPacketMoney <= 0 || data.RedPacketNum <= 0 {
 		return errors.New("参数不正确")
 	}
 	//红包个数
-	if this.Data.RedPacketNum <= 0 || this.Data.RedPacketNum > RED_PACKET_NUM_MAX {
+	if data.RedPacketNum <= 0 || data.RedPacketNum > RED_PACKET_NUM_MAX {
 		return errors.New("红包个数不可超过200")
 	}
 	//红包类型与红包大小判断
-	if this.Data.RedPacketType == GENERAL_RED_PACKET {
+	if data.RedPacketType == GENERAL_RED_PACKET {
 		//普通红包
-		if this.Data.RedPacketMoney <= 0 || this.Data.RedPacketMoney > 200 {
+		if data.RedPacketMoney <= 0 || data.RedPacketMoney > 200 {
 			return errors.New("单个红包不能大于200元")
 		}
-	} else if this.Data.RedPacketType == LUCKY_RED_PACKET || this.Data.RedPacketType == QUESTIONS_RED_PACKET {
+	} else if data.RedPacketType == LUCKY_RED_PACKET || data.RedPacketType == QUESTIONS_RED_PACKET {
 		//手气红包和答题红包
 		//单个红包不可小于0.01
-		if this.Data.RedPacketMoney < (float64(this.Data.RedPacketNum) * 0.01) {
+		if data.RedPacketMoney < (float64(data.RedPacketNum) * 0.01) {
 			return errors.New("单个红包不能小于0.01元")
 		}
 		//单个红包不可大于200
-		if this.Data.RedPacketMoney*100 > (float64(this.Data.RedPacketNum) * RED_PACKET_MAX) {
+		if data.RedPacketMoney*100 > (float64(data.RedPacketNum) * RED_PACKET_MAX) {
 			return errors.New("单个红包不能大于200元")
 		}
 	} else {
@@ -118,14 +83,14 @@ func (this *Req_GenRedPacket) CheckParameter() error {
 	}
 
 	//答题红包
-	if this.Data.RedPacketType == QUESTIONS_RED_PACKET {
-		if this.Data.Question.Title == "" {
+	if data.RedPacketType == QUESTIONS_RED_PACKET {
+		if data.Question.Title == "" {
 			return errors.New("答题红包，题目不可为空")
 		}
-		if len(this.Data.Question.Question) < 2 {
+		if len(data.Question.Question) < 2 {
 			return errors.New("答题红包，答案不可少于2个")
 		}
-		if this.Data.Question.Key < 0 || this.Data.Question.Key >= int64(len(this.Data.Question.Question)) {
+		if data.Question.Key < 0 || data.Question.Key >= int64(len(data.Question.Question)) {
 			return errors.New("正确答案选择有误")
 		}
 	}

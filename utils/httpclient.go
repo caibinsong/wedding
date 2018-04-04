@@ -73,7 +73,7 @@ func (this *HttpClient) GetWXUserInfoResponse(userid int64) (*config.WXUserInfoR
 
 	//判断是否成功
 	if response.Code != 0 {
-		log.Println("login robot result code error: ", response.Code, response.Msg)
+		log.Println("response.Code error: ", response.Code, response.Msg)
 		return nil, fmt.Errorf(response.Msg)
 	}
 	return response, nil
@@ -107,7 +107,7 @@ func (this *HttpClient) GetWXUserListResponse(userlist []int) (*config.WXUserLis
 
 	//判断是否成功
 	if response.Code != 0 {
-		log.Println("login robot result code error: ", response.Code, response.Msg)
+		log.Println("response.Code error: ", response.Code, response.Msg)
 		return nil, err
 	}
 	return response, nil
@@ -137,7 +137,7 @@ func (this *HttpClient) RoomSvr(serverName, methodname string, data map[string]i
 
 	//判断是否成功
 	if response.Code != 0 {
-		log.Println("login robot result code error: ", response.Code, response.Msg)
+		log.Println("response.Code error: ", response.Code, response.Msg)
 		return errors.New(fmt.Sprint(response.Code))
 	}
 	return nil
@@ -167,7 +167,7 @@ func (this *HttpClient) AccessCtrlSvr(serverName, methodname string, data map[st
 
 	//判断是否成功
 	if response.Code != 0 {
-		log.Println("login robot result code error: ", response.Code, response.Data)
+		log.Println("response.Code error: ", response.Code, response.Data)
 		return errors.New(fmt.Sprint(response.Code))
 	}
 	return nil

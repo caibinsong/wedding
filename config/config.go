@@ -77,54 +77,6 @@ func GetConfig() *Config {
 	return config
 }
 
-// package config
-
-// const (
-// 	ServerName = "wedding" //服务名
-
-// 	ONE_DAY = 24 * 60 * 60
-
-// 	WX_GetUserInfo     = "getUserInfo"
-// 	WX_GetUserList     = "getUserList"
-// 	RoomSvr_ServerName = "Chatroom"
-// 	RoomSvr_MethodName = "SendMessage"
-
-// 	RESPONSE_OK      = 0
-// 	RESPONSE_ERROR   = 1
-// 	ERROR_MSG        = "系统错误"
-// 	WX_USER_INFO_URL = "https://access.hunlibaoapp.com/socket/response.do"
-// 	WX_USER_LIST_URL = "https://access.hunlibaoapp.com/socket/response.do"
-// 	RoomSvr_URL      = "https://access.hunlibaoapp.com/socket/response.do"
-
-// 	//redis Key前缀
-// 	REDIS_REDPACK      = "redpack_"      //+ rp_id
-// 	REDIS_REDPACK_USER = "redpack_user_" //+ rp_id
-
-// 	//微信支付
-// 	APP_ID           = "wx1e16505b46f55fc3"
-// 	MCH_ID           = "1456793102"
-// 	NOTIFY_URL       = "https://logic.hunlibaoapp.com/wxpay/wxpay_notify"
-// 	SPBILL_CREATE_IP = "172.17.0.13"
-// 	KEY              = "Ej1OlMdS54J8AfsZcmZGfYufNqYPSXuH"
-// 	WX_RETURN        = `<xml>
-// 						  <return_code><![CDATA[%s]]></return_code>
-// 						  <return_msg><![CDATA[%s]]></return_msg>
-// 						</xml>`
-
-// 	ATTR_STR = "pay_target=redpacket;rpid="
-// 	ROOM_SVR = "roomsvr="
-
-// 	//my数据库
-// 	DBName = "cAuth"     //wedding_card
-// 	USER   = "root"      //root
-// 	PASS   = "123456"    //tkC42cwy2U3SQwHw
-// 	HOST   = "127.0.0.1" //172.17.0.5
-// 	DEBUG  = "dev"       //prod
-
-// 	//redis数据库连接
-// 	REDIS_CONNECT = "127.0.0.1:6379"
-// )
-
 // /*
 // 	//BalanceLog - OperateType
 // 	1 //收到礼金 加余额

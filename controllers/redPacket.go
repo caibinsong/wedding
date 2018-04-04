@@ -125,7 +125,6 @@ func GrabRedPacket(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		Response.Msg = "广播失败"
 	}
-
 	/////广播
 	data := map[string]interface{}{"rp_id": req.Data.RpId,
 		"red_type": redPacket.RedPacketType}

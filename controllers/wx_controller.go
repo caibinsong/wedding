@@ -64,7 +64,6 @@ func WXGenRedPacket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	attach := ToSimpleAttach(result["rp_id"].(int64), req.Data.Params.RedPacketType, result["wish"].(string), req.Data.Params.RoomId, req.Data.Params.WeddingId, userid, 4)
-	//
 	rsp, paySign, nonceStr, timestamp, err := NewWXRedPacket(result["rp_id"].(int64), result["guid"].(string), int64(redFlash.Money*100),
 		userinfo.Data.OpenId, attach)
 	if err != nil {
@@ -106,11 +105,10 @@ func ToJsonAttach(msg string) (int, string, error) {
 	}
 	rst := fmt.Sprintf(`{"chatroomId":%s,"msgType":%s,"userId":%s,"weddingId":%s,"msg":"{\"rp_id\":%s,\"type\":%s,\"wish\":\"%s\",\"question\": \"%s\"}"}`,
 		arr[4], arr[7], arr[6], arr[5], arr[1], arr[2], arr[3], strings.Replace(redpacket.Question, "\"", "\\\\\\\"", -1))
-	//log.Println(rst)
 	return rp_id, rst, nil
 }
 
-func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string) ( /*map[string]string*/ *pay.UnifiedOrderResponse, string, string, string, error) {
+func NewWXRedPacket(rp_id int64, guid string, money int64, openid, attach string) (*pay.UnifiedOrderResponse, string, string, string, error) {
 	nonceStr := string(rand.NewHex())
 	uor := &pay.UnifiedOrderRequest{
 		DeviceInfo:     "WEB",
