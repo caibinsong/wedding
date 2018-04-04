@@ -125,7 +125,7 @@ func (this *AccessCtrlWork) work(i int) {
 			Msg = "红包已经抢完！"
 		}
 
-		speeding, err := QuerySpending(accessCtr.UserId, redPacket.CreateAt)
+		speeding, err := QuerySpending(redPacket.UserId, redPacket.CreateAt)
 		if err != nil {
 			log.Println(err.Error())
 			Msg = "数据库操作失败"

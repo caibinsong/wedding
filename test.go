@@ -49,7 +49,7 @@ func post(id int) {
 		"MethodName":   "grabRedPacket",
 		"userid":       fmt.Sprint(id),
 		"Content-Type": "application/json"}
-	var data = map[string]interface{}{"rp_id": 188}
+	var data = map[string]interface{}{"rp_id": 196}
 	var request = map[string]interface{}{"action_name": "grab_red_packet",
 		"data": data}
 	r, err := utils.NewHttpClient().Post("http://182.254.247.115:5501/rpc", hear, request)
