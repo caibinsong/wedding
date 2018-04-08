@@ -41,7 +41,10 @@ func openDb() {
 	db.DB().SetMaxIdleConns(20)
 	db.DB().SetMaxOpenConns(50)
 	initTable()
+	ConnectRedis()
+}
 
+func ConnectRedis() {
 	//连接redis数据库
 	c, err := redis.Dial("tcp", config.GetConfig().Redis)
 	if err != nil {

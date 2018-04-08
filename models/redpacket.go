@@ -145,10 +145,15 @@ func isEndStatus(rp_id int64) bool {
 
 //判断红包是否还有
 func hasRedPacket(rp_id int64) bool {
-	redPacket, err := redis.String(GetRedisDB().Do("GET",
-		fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
+	redPacket, err := redis.String(GetRedisDB().Do("GET", fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
 	if err != nil {
-		return false
+		if strings.Index(err.Error(), "connection timed out") > 0 {
+			ConnectRedis()
+			redPacket, err = redis.String(GetRedisDB().Do("GET", fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
+		}
+		if err != nil {
+			return false
+		}
 	}
 	if strings.Index(redPacket, "_") > 0 {
 		return true

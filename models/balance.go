@@ -8,6 +8,7 @@ import (
 	"github.com/caibinsong/wedding/utils"
 	"github.com/jinzhu/gorm"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -189,8 +190,14 @@ func GenRedPacket(userId int64, useNum utils.RedFlash, req *config.Req_GenRedPac
 	//保存入redis数据库
 	_, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, redPacket.RpId), "")
 	if err != nil {
-		log.Println("redis set failed:", err)
-		return resultMap, bill_no, ERROR_DB_ACTION
+		if strings.Index(err.Error(), "connection timed out") > 0 {
+			ConnectRedis()
+			_, err = GetRedisDB().Do("SET", fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, redPacket.RpId), "")
+		}
+		if err != nil {
+			log.Println("redis set:", err)
+			return resultMap, bill_no, ERROR_DB_ACTION
+		}
 	}
 	//格式：1_3.59;2_7.93;3_3.48;
 	redis_redpack := ""

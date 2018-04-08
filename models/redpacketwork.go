@@ -32,14 +32,20 @@ func GetRedPack(userid, rpid int64) error {
 func (this *redPacketWork) getRedPack(user_id, rp_id int64) error {
 	status := CheckRedPacket(user_id, rp_id)
 	if status == 0 {
-		redPacket, err := redis.String(GetRedisDB().Do("GET",
-			fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
+		redPacket, err := redis.String(GetRedisDB().Do("GET", fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
 		if err != nil {
+			if strings.Index(err.Error(), "connection timed out") > 0 {
+				ConnectRedis()
+				redPacket, err = redis.String(GetRedisDB().Do("GET", fmt.Sprintf("%s%d", config.REDIS_REDPACK, rp_id)))
+			}
+			if err != nil {
+				log.Println("redis get:", err)
+				return err
+			}
 			log.Println(redPacket, err)
 			return err
 		}
-		redPacketUser, err := redis.String(GetRedisDB().Do("GET",
-			fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, rp_id)))
+		redPacketUser, err := redis.String(GetRedisDB().Do("GET", fmt.Sprintf("%s%d", config.REDIS_REDPACK_USER, rp_id)))
 		if err != nil {
 			return err
 		}
